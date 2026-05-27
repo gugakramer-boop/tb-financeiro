@@ -375,6 +375,13 @@ html[data-theme="dark"] .delta.neg{background:rgba(248,113,113,0.14)}
 .bnav button.active .ic{transform:scale(1.1)}
 .bnav button:active{background:var(--cp-surface-soft)}
 
+/* Áreas hub chips (mobile-only sub-nav inside areas/noivas/cursos panels) */
+.area-chips{display:none;gap:6px;margin:-6px 0 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.area-chips::-webkit-scrollbar{display:none}
+.area-chips button{flex:0 0 auto;padding:7px 14px;border:1px solid var(--cp-border);background:var(--cp-surface);color:var(--cp-text-muted);border-radius:99px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500;white-space:nowrap}
+.area-chips button.active{background:var(--cp-accent);color:#fff;border-color:var(--cp-accent)}
+@media (max-width:760px){.area-chips{display:flex}}
+
 /* ============ FOOTER ============ */
 .footer{padding:20px 16px 8px;text-align:center;color:var(--cp-text-soft);font-size:11px}
 
@@ -897,6 +904,11 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 
   <!-- NOIVAS -->
   <section class="panel" id="panel-noivas">
+    <div class="area-chips" data-chips="areas-hub">
+      <button data-tab="areas">Geral</button>
+      <button class="active" data-tab="noivas">💍 Noivas</button>
+      <button data-tab="cursos">🎓 Cursos</button>
+    </div>
     <div class="hero">
       <div class="eyebrow"><span class="dot"></span> Noivas — Resultado</div>
       <div class="big" id="noivasNet"><span class="cur">R$</span><span id="noivasNetNum">—</span></div>
@@ -920,6 +932,11 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 
   <!-- CURSOS -->
   <section class="panel" id="panel-cursos">
+    <div class="area-chips" data-chips="areas-hub">
+      <button data-tab="areas">Geral</button>
+      <button data-tab="noivas">💍 Noivas</button>
+      <button class="active" data-tab="cursos">🎓 Cursos</button>
+    </div>
     <div class="hero">
       <div class="eyebrow"><span class="dot"></span> Cursos — Resultado</div>
       <div class="big" id="cursosNet"><span class="cur">R$</span><span id="cursosNetNum">—</span></div>
@@ -946,6 +963,11 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 
   <!-- AREAS -->
   <section class="panel" id="panel-areas">
+    <div class="area-chips" data-chips="areas-hub">
+      <button class="active" data-tab="areas">Geral</button>
+      <button data-tab="noivas">💍 Noivas</button>
+      <button data-tab="cursos">🎓 Cursos</button>
+    </div>
     <div class="subhead">Top despesas com tendência <span class="info">últimos 6 meses</span></div>
     <div class="card" style="padding:6px 16px">
       <div class="spark-list" id="topDespesasSparks"></div>
@@ -997,8 +1019,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 <nav class="bnav">
   <button class="active" data-tab="resumo"><span class="ic">📊</span>Resumo</button>
   <button data-tab="dre"><span class="ic">📅</span>DRE</button>
-  <button data-tab="noivas"><span class="ic">💍</span>Noivas</button>
-  <button data-tab="cursos"><span class="ic">🎓</span>Cursos</button>
+  <button data-tab="areas" data-tab-group="areas-hub"><span class="ic">📂</span>Áreas</button>
   <button data-tab="lancamentos"><span class="ic">📋</span>Itens</button>
 </nav>
 
@@ -1066,7 +1087,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:19</span> · <span id="recCount"></span> lançamentos · v4.6 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:28</span> · <span id="recCount"></span> lançamentos · v4.7 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1471,15 +1492,20 @@ document.querySelectorAll('.preset-grid .p-chip').forEach(b => b.addEventListene
 }));
 
 /* ===================== TABS ===================== */
+const AREAS_HUB = new Set(['areas','noivas','cursos']);
 function setTab(t){
   state.tab = t;
   document.querySelectorAll('.tab-top').forEach(x => x.classList.toggle('active', x.dataset.tab===t));
-  document.querySelectorAll('.bnav button').forEach(x => x.classList.toggle('active', x.dataset.tab===t));
+  document.querySelectorAll('.bnav button').forEach(x => {
+    const isHub = x.dataset.tabGroup==='areas-hub';
+    x.classList.toggle('active', isHub ? AREAS_HUB.has(t) : x.dataset.tab===t);
+  });
+  document.querySelectorAll('.area-chips button').forEach(x => x.classList.toggle('active', x.dataset.tab===t));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id==='panel-'+t));
   renderActive();
   window.scrollTo({top:0,behavior:'instant'});
 }
-document.querySelectorAll('.tab-top, .bnav button').forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
+document.querySelectorAll('.tab-top, .bnav button, .area-chips button').forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
 
 /* ===================== THEME ===================== */
 document.getElementById('themeBtn').addEventListener('click', () => {
