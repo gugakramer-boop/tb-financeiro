@@ -1,5 +1,5 @@
 // TB Financeiro service worker
-const CACHE = 'tb-finance-v4.7.3';
+const CACHE = 'tb-finance-v4.7.4';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png'];
 
 self.addEventListener('install', e => {

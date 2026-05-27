@@ -768,19 +768,6 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       </div>
     </div>
 
-    <div class="caixa-card" id="caixaCard">
-      <div class="caixa-col">
-        <div class="lbl">💵 Caixa hoje (realizado)</div>
-        <div class="val" id="caixaHoje">—</div>
-        <div class="sub" id="caixaHojeSub"></div>
-      </div>
-      <div class="caixa-col">
-        <div class="lbl">🔮 Previsto no período</div>
-        <div class="val" id="caixaPrev">—</div>
-        <div class="sub" id="caixaPrevSub"></div>
-      </div>
-    </div>
-
     <div class="health-card" id="healthCard">
       <div class="health-top">
         <div class="health-circle">
@@ -1091,7 +1078,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 08:21</span> · <span id="recCount"></span> lançamentos · v4.7.3 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 08:25</span> · <span id="recCount"></span> lançamentos · v4.7.4 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1782,9 +1769,6 @@ function renderResumo(){
 
   // Insights
   renderInsights(recs, prev);
-
-  // Caixa atual + previsto
-  renderCaixa();
 
   // Saúde do negócio
   renderHealthScore(recs, prev);
@@ -2752,28 +2736,8 @@ function renderAIInsights(recs, prev){
   ).join('');
 }
 
-/* ===================== CAIXA (realizado + previsto) ===================== */
-function todayISO(){ return new Date().toISOString().slice(0,10); }
-function renderCaixa(){
-  const today = todayISO();
-  // Caixa hoje = soma realizada de TODOS os lançamentos com data <= hoje
-  const real = LANCAMENTOS.filter(r => r.data <= today);
-  const caixaHoje = sumRec(real) - sumDes(real);
-  document.getElementById('caixaHoje').textContent = (caixaHoje>=0?'R$ ':'-R$ ') + Math.abs(caixaHoje).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  document.getElementById('caixaHoje').className = 'val ' + (caixaHoje>=0?'pos':'neg');
-  document.getElementById('caixaHojeSub').textContent = `${real.length.toLocaleString('pt-BR')} lançamentos até ${formatDate(today)}`;
-  // Previsto = caixa hoje + delta dos lançamentos FUTUROS dentro do período selecionado
-  const recs = recordsInPeriod();
-  const futuros = recs.filter(r => r.data > today);
-  const deltaFut = sumRec(futuros) - sumDes(futuros);
-  const previsto = caixaHoje + deltaFut;
-  document.getElementById('caixaPrev').textContent = (previsto>=0?'R$ ':'-R$ ') + Math.abs(previsto).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  document.getElementById('caixaPrev').className = 'val ' + (previsto>=0?'pos':'neg');
-  const sub = futuros.length ? `${futuros.length} previstos (${deltaFut>=0?'+':''}${fmtCompact(deltaFut)})` : 'Sem lançamentos futuros no período';
-  document.getElementById('caixaPrevSub').textContent = sub;
-}
-
 /* ===================== HEATMAP DE FLUXO DIÁRIO ===================== */
+function todayISO(){ return new Date().toISOString().slice(0,10); }
 function renderHeatmap(){
   const grid = document.getElementById('heatmapGrid');
   const today = new Date();
