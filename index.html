@@ -282,7 +282,7 @@ html[data-theme="dark"] .delta.neg{background:rgba(248,113,113,0.14)}
 
 /* ============ FILTERS ============ */
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.filters-collapse{margin-bottom:12px;border:1px solid var(--cp-border);border-radius:12px;background:var(--cp-surface);overflow:hidden}
+.filters-collapse{margin-bottom:12px;border:1px solid var(--cp-border);border-radius:12px;background:var(--cp-surface)}
 .filters-collapse>summary{list-style:none;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:600;color:var(--cp-text);display:flex;align-items:center;gap:8px;user-select:none}
 .filters-collapse>summary::-webkit-details-marker{display:none}
 .filters-collapse>summary::before{content:"+";display:inline-block;width:18px;height:18px;line-height:16px;text-align:center;border:1px solid var(--cp-border);border-radius:6px;font-weight:700;color:var(--cp-accent)}
@@ -696,7 +696,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 .ms-btn{width:100%;padding:9px 30px 9px 12px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:12px;font-size:13px;color:var(--cp-text);text-align:left;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
 .ms-btn::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--cp-text-soft);pointer-events:none}
 .ms-btn.has-sel{border-color:var(--cp-accent);color:var(--cp-accent);font-weight:600}
-.ms-pop{position:absolute;top:calc(100% + 4px);left:0;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:10px;box-shadow:var(--cp-shadow-strong);z-index:50;max-height:60vh;overflow-y:auto;display:none;padding:4px;min-width:max(100%,240px);max-width:min(360px,calc(100vw - 32px))}
+.ms-pop{position:absolute;top:calc(100% + 4px);left:0;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:10px;box-shadow:var(--cp-shadow-strong);z-index:50;max-height:min(70vh,520px);overflow-y:auto;overscroll-behavior:contain;display:none;padding:4px;min-width:max(100%,280px);max-width:min(440px,calc(100vw - 32px))}
 .ms-pop.right{left:auto;right:0}
 .ms-pop.open{display:block}
 .ms-pop label{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--cp-text);line-height:1.35;word-break:break-word}
@@ -704,6 +704,31 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 .ms-pop input[type=checkbox]{width:auto;margin:2px 0 0;accent-color:var(--cp-accent);flex:0 0 auto}
 .ms-pop .ms-head{display:flex;justify-content:space-between;padding:6px 10px 4px;border-bottom:1px solid var(--cp-border);margin-bottom:4px}
 .ms-pop .ms-head button{background:none;border:none;color:var(--cp-accent);font-size:11.5px;cursor:pointer;padding:2px 4px;font-weight:600}
+
+/* ============ MODERN ITEMS TABLE ============ */
+.lanc-table-wrap{overflow-x:auto;max-width:100%;border:1px solid var(--cp-border);border-radius:12px;background:var(--cp-surface)}
+.lanc-table{border-collapse:separate;border-spacing:0;table-layout:fixed;width:100%;min-width:1280px;font-size:12.5px}
+.lanc-table thead th{position:sticky;top:0;background:var(--cp-surface);border-bottom:2px solid var(--cp-border);padding:10px 10px 10px 12px;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--cp-text-soft);cursor:pointer;user-select:none;white-space:nowrap;z-index:5;font-weight:700;position:sticky}
+.lanc-table thead th:hover{color:var(--cp-accent)}
+.lanc-table thead th .sort-ind{font-size:9px;margin-left:4px;opacity:.4}
+.lanc-table thead th.sorted{color:var(--cp-accent)}
+.lanc-table thead th.sorted .sort-ind{opacity:1}
+.lanc-table thead th .resize-handle{position:absolute;right:0;top:0;width:6px;height:100%;cursor:col-resize;user-select:none;z-index:6}
+.lanc-table thead th .resize-handle:hover{background:var(--cp-accent);opacity:.4}
+.lanc-table thead th{position:sticky}
+.lanc-table tbody td{padding:9px 10px 9px 12px;border-bottom:1px solid var(--cp-border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;color:var(--cp-text)}
+.lanc-table tbody tr{cursor:pointer}
+.lanc-table tbody tr:hover{background:var(--cp-surface-soft)}
+.lanc-table tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
+.lanc-table tbody tr:nth-child(even):hover{background:var(--cp-surface-soft)}
+.lanc-table tbody td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.lanc-table tbody td.num.pos{color:var(--cp-success)}
+.lanc-table tbody td.num.neg{color:var(--cp-danger)}
+.lanc-table tbody td .bk-chip{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;white-space:nowrap}
+.lanc-table tbody td.tipo-rec{color:var(--cp-success);font-weight:600}
+.lanc-table tbody td.tipo-des{color:var(--cp-danger);font-weight:600}
+.lanc-table tbody tr.resizing,.lanc-table.resizing{cursor:col-resize !important;user-select:none}
+.lanc-empty{padding:24px;text-align:center;color:var(--cp-text-soft);font-size:13px}
 </style>
 </head>
 <body class="locked">
@@ -1028,19 +1053,26 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
         <div class="ms-wrap"><button type="button" class="ms-btn" id="fCatBtn" data-default="Todas as categorias">Todas as categorias</button><div class="ms-pop" id="fCatPop"></div></div>
         <div class="ms-wrap"><button type="button" class="ms-btn" id="fRespBtn" data-default="Todos os responsáveis">Todos os responsáveis</button><div class="ms-pop" id="fRespPop"></div></div>
         <div class="ms-wrap"><button type="button" class="ms-btn" id="fContaBtn" data-default="Todas as contas">Todas as contas</button><div class="ms-pop" id="fContaPop"></div></div>
-        <select id="fSort" class="sort">
-          <option value="data-desc">🗓️ Data ↓</option>
-          <option value="data-asc">🗓️ Data ↑</option>
-          <option value="valor-desc">💰 Valor ↓</option>
-          <option value="valor-asc">💰 Valor ↑</option>
-          <option value="bucket">🏷️ Bucket (A–Z)</option>
-          <option value="area">📂 Área (A–Z)</option>
-          <option value="descricao">📝 Descrição (A–Z)</option>
-        </select>
         <button class="btn-secondary" id="fClear" style="margin-left:auto">Limpar filtros</button>
       </div>
     </details>
-    <div class="card" style="padding:6px 16px"><div class="row-list" id="lancList"></div></div>
+    <div class="lanc-table-wrap">
+      <table class="lanc-table" id="lancTable">
+        <thead><tr>
+          <th data-sort="data"        style="width:78px"  data-default-w="78">Data<span class="sort-ind">▼</span><span class="resize-handle"></span></th>
+          <th data-sort="tipo"        style="width:80px"  data-default-w="80">Tipo<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="bucket"      style="width:170px" data-default-w="170">Bucket<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="sub"         style="width:160px" data-default-w="160">Sub-Categoria<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="area"        style="width:120px" data-default-w="120">Área<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="categoria"   style="width:160px" data-default-w="160">Categoria<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="descricao"   style="width:260px" data-default-w="260">Descrição<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="conta"       style="width:120px" data-default-w="120">Conta<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="responsavel" style="width:110px" data-default-w="110">Responsável<span class="sort-ind"></span><span class="resize-handle"></span></th>
+          <th data-sort="valor"       style="width:120px;text-align:right" data-default-w="120">Valor<span class="sort-ind"></span><span class="resize-handle"></span></th>
+        </tr></thead>
+        <tbody id="lancTbody"></tbody>
+      </table>
+    </div>
     <div style="text-align:center;margin-top:12px">
       <button class="p-chip" id="lancMore" style="display:none"></button>
     </div>
@@ -1119,7 +1151,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 09:48</span> · <span id="recCount"></span> lançamentos · v4.7.9 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 10:19</span> · <span id="recCount"></span> lançamentos · v4.8.0 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -2199,19 +2231,26 @@ function renderDRE(){
     const net = s.r - s.d;
     const total = s.r + s.d || 1;
     const rPct = (s.r/total*100), dPct = (s.d/total*100);
-    const byArea = {};
+    const byBucket = {};
     monthRecs.forEach(r => {
-      const k = r.area||'(sem área)';
-      if(!byArea[k]) byArea[k]={r:0,d:0,n:0};
-      byArea[k][r.tipo==='Receita'?'r':'d'] += r.valor; byArea[k].n++;
+      const k = r.bucket||'(sem bucket)';
+      if(!byBucket[k]) byBucket[k]={r:0,d:0,n:0,subs:{}};
+      byBucket[k][r.tipo==='Receita'?'r':'d'] += r.valor;
+      byBucket[k].n++;
+      const sk = r.sub||'(sem sub)';
+      if(!byBucket[k].subs[sk]) byBucket[k].subs[sk] = {r:0,d:0,n:0};
+      byBucket[k].subs[sk][r.tipo==='Receita'?'r':'d'] += r.valor;
+      byBucket[k].subs[sk].n++;
     });
-    const areaTotal = Object.values(byArea).reduce((a,v)=>a + v.r,0) || 1;
-    const areaRows = Object.entries(byArea).sort((a,b)=>(b[1].r-b[1].d)-(a[1].r-a[1].d)).map(([a,v])=>{
-      const n = v.r-v.d; const c = hashColor(a); const pct = (v.r/areaTotal*100);
-      return `<div class="cat-row" data-month="${mi}" data-y="${yy}" data-area="${escapeHtml(a)}">
-        <div class="top"><span class="swatch" style="background:${c}"></span><span class="name">${escapeHtml(a)}</span><span class="amt ${n>=0?'pos':'neg'}">${fmtCompact(n)}</span></div>
+    const bucketAbsTotal = Object.values(byBucket).reduce((a,v)=>a + (v.r+v.d),0) || 1;
+    const bucketRows = Object.entries(byBucket).sort((a,b)=>(b[1].r+b[1].d)-(a[1].r+a[1].d)).map(([bk,v])=>{
+      const n = v.r-v.d; const c = hashColor(bk); const pct = ((v.r+v.d)/bucketAbsTotal*100);
+      const topSubs = Object.entries(v.subs).sort((a,b)=>(b[1].r+b[1].d)-(a[1].r+a[1].d)).slice(0,3)
+        .map(([sk,sv])=>`${escapeHtml(sk)} (${fmtCompact(sv.r+sv.d)})`).join(' · ');
+      return `<div class="cat-row" data-month="${mi}" data-y="${yy}" data-bucket="${escapeHtml(bk)}">
+        <div class="top"><span class="swatch" style="background:${c}"></span><span class="name">${escapeHtml(bk)}</span><span class="amt ${n>=0?'pos':'neg'}">${fmtCompact(n)}</span></div>
         <div class="bar"><div class="fill" style="width:${pct}%;background:${c}"></div></div>
-        <div class="footnote"><span>+${fmtCompact(v.r)} / -${fmtCompact(v.d)}</span><span>${v.n} itens</span></div>
+        <div class="footnote"><span>+${fmtCompact(v.r)} / -${fmtCompact(v.d)} · ${v.n} itens</span><span style="opacity:.75">${topSubs}</span></div>
       </div>`;
     }).join('');
     return `<div class="month-card" data-key="${s.key}">
@@ -2226,7 +2265,7 @@ function renderDRE(){
           <div class="mh-caret">▼</div>
         </div>
       </div>
-      <div class="month-body">${areaRows}
+      <div class="month-body">${bucketRows}
         <div style="margin-top:12px"><button class="p-chip" data-allmonth="${s.key}">Ver todos os ${monthRecs.length} lançamentos</button></div>
       </div>
     </div>`;
@@ -2236,11 +2275,11 @@ function renderDRE(){
   el.querySelectorAll('.month-card').forEach(card => {
     card.querySelector('.month-head').addEventListener('click', () => card.classList.toggle('open'));
   });
-  el.querySelectorAll('.cat-row[data-area]').forEach(r => r.addEventListener('click', e => {
+  el.querySelectorAll('.cat-row[data-bucket]').forEach(r => r.addEventListener('click', e => {
     e.stopPropagation();
-    const key = r.closest('.month-card').dataset.key; const a = r.dataset.area;
+    const key = r.closest('.month-card').dataset.key; const bk = r.dataset.bucket;
     const [yy,mm] = key.split('-');
-    openDrill(`${a} · ${MONTHS_FULL[parseInt(mm,10)-1]} ${yy}`, recs.filter(x=>ymKey(x)===key && (x.area||'(sem área)')===a));
+    openDrill(`${bk} · ${MONTHS_FULL[parseInt(mm,10)-1]} ${yy}`, recs.filter(x=>ymKey(x)===key && (x.bucket||'(sem bucket)')===bk));
   }));
   el.querySelectorAll('button[data-allmonth]').forEach(b => b.addEventListener('click', e => {
     e.stopPropagation();
@@ -2445,6 +2484,7 @@ function renderAreas(){
 
 /* ===================== LANCAMENTOS ===================== */
 let lancShown = 60;
+let lancSort = { key: 'data', dir: 'desc' };
 const lancFilter = {
   tipos: new Set(),
   areas: new Set(),
@@ -2517,21 +2557,19 @@ function renderLanc(){
   buildMultiSelect('fCatBtn','fCatPop', uniq('categoria'), 'Todas as categorias', lancFilter.cats);
   buildMultiSelect('fRespBtn','fRespPop', uniq('responsavel'), 'Todos os responsáveis', lancFilter.resps);
   buildMultiSelect('fContaBtn','fContaPop', uniq('conta'), 'Todas as contas', lancFilter.contas);
+  setupLancTableInteractions();
   applyLancFilter(recs);
 }
 function getFilteredLanc(baseRecs){
   baseRecs = baseRecs || recordsInPeriod();
   const q = (document.getElementById('fSearch').value||'').toLowerCase();
-  const sortBy = (document.getElementById('fSort')||{}).value || 'data-desc';
-  const sorters = {
-    'data-desc': (x,y)=>y.data.localeCompare(x.data),
-    'data-asc':  (x,y)=>x.data.localeCompare(y.data),
-    'valor-desc':(x,y)=>(y.valor||0)-(x.valor||0),
-    'valor-asc': (x,y)=>(x.valor||0)-(y.valor||0),
-    'bucket':    (x,y)=>(x.bucket||'').localeCompare(y.bucket||'','pt-BR'),
-    'area':      (x,y)=>(x.area||'').localeCompare(y.area||'','pt-BR'),
-    'descricao': (x,y)=>(x.descricao||x.categoria||'').localeCompare(y.descricao||y.categoria||'','pt-BR'),
-  };
+  const k = lancSort.key, dir = lancSort.dir==='asc' ? 1 : -1;
+  const numCmp = (a,b)=>((+a||0)-(+b||0))*dir;
+  const strCmp = (a,b)=>((a||'')+'').localeCompare(((b||'')+''),'pt-BR')*dir;
+  let cmp;
+  if(k==='valor') cmp = (x,y)=>numCmp(x.valor, y.valor);
+  else if(k==='data') cmp = (x,y)=>(x.data.localeCompare(y.data))*dir;
+  else cmp = (x,y)=>strCmp(x[k], y[k]);
   const f = lancFilter;
   return baseRecs
     .filter(r => f.tipos.size===0   || f.tipos.has(r.tipo))
@@ -2548,31 +2586,95 @@ function getFilteredLanc(baseRecs){
       || (r.bucket||'').toLowerCase().includes(q)
       || (r.sub||'').toLowerCase().includes(q)
       || (r.responsavel||'').toLowerCase().includes(q))
-    .sort(sorters[sortBy] || sorters['data-desc']);
+    .sort(cmp);
 }
 function applyLancFilter(baseRecs){
   baseRecs = baseRecs || recordsInPeriod();
   const filtered = getFilteredLanc(baseRecs);
   const show = filtered.slice(0,lancShown);
-  document.getElementById('lancList').innerHTML = show.map(r => {
-    const sign = r.tipo==='Receita'?'pos':'neg';
-    const sv = (r.tipo==='Receita'?'+':'-') + fmt(r.valor).replace('-','');
-    const c = hashColor(r.bucket||r.area||r.categoria||'');
-    const tagBucket = r.bucket ? `<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:${c}22;color:${c};font-weight:600;margin-right:4px">${escapeHtml(r.bucket)}</span>` : '';
-    const subTxt = r.sub ? ` › ${escapeHtml(r.sub)}` : '';
-    return `<div class="row"><span class="swatch" style="background:${c}"></span><div class="left">
-      <div class="name">${tagBucket}${escapeHtml(r.descricao||r.categoria||'(sem descrição)')}</div>
-      <div class="meta">${formatDate(r.data)} · ${escapeHtml(r.area||'')}${subTxt} · ${escapeHtml(r.categoria||'')}</div>
-    </div><div class="amt ${sign}">${sv}</div></div>`;
-  }).join('') || '<div class="empty">Nenhum lançamento encontrado.</div>';
+  const tbody = document.getElementById('lancTbody');
+  if(!show.length){
+    tbody.innerHTML = `<tr><td colspan="10" class="lanc-empty">Nenhum lançamento encontrado.</td></tr>`;
+  } else {
+    tbody.innerHTML = show.map(r => {
+      const sign = r.tipo==='Receita'?'pos':'neg';
+      const sv = (r.tipo==='Receita'?'+':'-') + fmt(r.valor).replace('-','');
+      const c = hashColor(r.bucket||r.area||r.categoria||'');
+      const chip = r.bucket
+        ? `<span class="bk-chip" style="background:${c}22;color:${c}" title="${escapeHtml(r.bucket)}">${escapeHtml(r.bucket)}</span>`
+        : '<span style="color:var(--cp-text-soft);font-size:11px">—</span>';
+      const tipoCls = r.tipo==='Receita' ? 'tipo-rec' : 'tipo-des';
+      return `<tr>
+        <td title="${escapeHtml(formatDate(r.data))}">${escapeHtml(formatDate(r.data))}</td>
+        <td class="${tipoCls}">${escapeHtml(r.tipo||'')}</td>
+        <td>${chip}</td>
+        <td title="${escapeHtml(r.sub||'')}">${escapeHtml(r.sub||'')}</td>
+        <td title="${escapeHtml(r.area||'')}">${escapeHtml(r.area||'')}</td>
+        <td title="${escapeHtml(r.categoria||'')}">${escapeHtml(r.categoria||'')}</td>
+        <td title="${escapeHtml(r.descricao||'')}">${escapeHtml(r.descricao||'(sem descrição)')}</td>
+        <td title="${escapeHtml(r.conta||'')}">${escapeHtml(r.conta||'')}</td>
+        <td title="${escapeHtml(r.responsavel||'')}">${escapeHtml(r.responsavel||'')}</td>
+        <td class="num ${sign}">${sv}</td>
+      </tr>`;
+    }).join('');
+  }
   const more = document.getElementById('lancMore');
   if(filtered.length>lancShown){ more.style.display='inline-block'; more.textContent=`Carregar mais (${filtered.length-lancShown} restantes)`; }
   else more.style.display='none';
   document.getElementById('lancCount').textContent = `${filtered.length} de ${baseRecs.length}`;
+  updateSortIndicators();
   refreshFilterBadge();
 }
+function updateSortIndicators(){
+  document.querySelectorAll('#lancTable thead th').forEach(th => {
+    const ind = th.querySelector('.sort-ind'); if(!ind) return;
+    if(th.dataset.sort === lancSort.key){
+      th.classList.add('sorted');
+      ind.textContent = lancSort.dir==='asc' ? '▲' : '▼';
+    } else {
+      th.classList.remove('sorted');
+      ind.textContent = '';
+    }
+  });
+}
+function setupLancTableInteractions(){
+  const table = document.getElementById('lancTable');
+  if(!table || table.dataset.wired==='1') return;
+  table.dataset.wired = '1';
+  // sort on header click
+  table.querySelectorAll('thead th').forEach(th => {
+    th.addEventListener('click', (e) => {
+      if(e.target.classList.contains('resize-handle')) return;
+      const key = th.dataset.sort; if(!key) return;
+      if(lancSort.key === key) lancSort.dir = lancSort.dir==='asc' ? 'desc' : 'asc';
+      else { lancSort.key = key; lancSort.dir = (key==='data'||key==='valor') ? 'desc' : 'asc'; }
+      lancShown = 60;
+      applyLancFilter();
+    });
+  });
+  // column resize
+  table.querySelectorAll('thead th .resize-handle').forEach(handle => {
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const th = handle.parentElement;
+      const startX = e.clientX;
+      const startW = th.getBoundingClientRect().width;
+      table.classList.add('resizing');
+      const onMove = (ev) => {
+        const w = Math.max(50, startW + (ev.clientX - startX));
+        th.style.width = w + 'px';
+      };
+      const onUp = () => {
+        table.classList.remove('resizing');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+}
 document.getElementById('fSearch').addEventListener('input', ()=>{lancShown=60;applyLancFilter();});
-document.getElementById('fSort').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
 document.addEventListener('click', () => document.querySelectorAll('.ms-pop.open').forEach(p=>p.classList.remove('open')));
 document.getElementById('lancMore').addEventListener('click', ()=>{lancShown+=120;applyLancFilter();});
 document.getElementById('fClear').addEventListener('click', () => {
