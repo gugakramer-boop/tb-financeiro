@@ -729,6 +729,20 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 .lanc-table tbody td.tipo-des{color:var(--cp-danger);font-weight:600}
 .lanc-table tbody tr.resizing,.lanc-table.resizing{cursor:col-resize !important;user-select:none}
 .lanc-empty{padding:24px;text-align:center;color:var(--cp-text-soft);font-size:13px}
+
+/* ============ ITEMS VIEW TOGGLE + COMPACT VIEW ============ */
+.lv-btn{background:var(--cp-surface);border:1px solid var(--cp-border);color:var(--cp-text-soft);padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.lv-btn:hover{border-color:var(--cp-accent);color:var(--cp-accent)}
+.lv-btn.active{background:var(--cp-accent);color:#fff;border-color:var(--cp-accent)}
+.lanc-compact-wrap{display:none}
+.lanc-compact-wrap .row-list{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:12px;padding:4px 12px}
+.lanc-compact-wrap .row{padding:9px 4px;gap:10px}
+.lanc-compact-wrap .row .left{min-width:0;flex:1}
+.lanc-compact-wrap .row .name{font-size:13px;font-weight:600;color:var(--cp-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lanc-compact-wrap .row .meta{font-size:11px;color:var(--cp-text-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.lanc-compact-wrap .row .amt{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;font-size:13px}
+.lanc-compact-wrap .row .swatch{flex-shrink:0;width:10px;height:34px;border-radius:3px}
+.lanc-compact-wrap .row .bk-chip{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;font-weight:600;margin-right:6px;vertical-align:baseline}
 </style>
 </head>
 <body class="locked">
@@ -937,24 +951,26 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <button data-tab="cursos">🎓 Cursos</button>
     </div>
     <div class="hero">
-      <div class="eyebrow"><span class="dot"></span> Noivas — Resultado</div>
-      <div class="big" id="noivasNet"><span class="cur">R$</span><span id="noivasNetNum">—</span></div>
+      <div class="eyebrow"><span class="dot"></span> Noivas — Recebido</div>
+      <div class="big pos" id="noivasNet"><span class="cur">R$</span><span id="noivasNetNum">—</span></div>
       <div><span class="delta neutral" id="noivasDelta">—</span></div>
       <div class="hero-bars">
         <div class="hero-bar income">
-          <div class="l">Receita</div><div class="v" id="noivasReceita">—</div>
+          <div class="l">Casamentos</div><div class="v" id="noivasCount">—</div>
           <div class="track"><div class="fill" id="noivasRecFill" style="width:0"></div></div>
         </div>
         <div class="hero-bar expense">
-          <div class="l">Despesa</div><div class="v" id="noivasDespesa">—</div>
+          <div class="l">Ticket médio</div><div class="v" id="noivasTicket">—</div>
           <div class="track"><div class="fill" id="noivasDesFill" style="width:0"></div></div>
         </div>
       </div>
     </div>
-    <div class="subhead">Por mês <span class="info">toque numa barra</span></div>
+    <div class="subhead">Recebido por casamento <span class="info">top 15</span></div>
     <div class="card"><div class="chart-wrap"><canvas id="chartNoivasMes"></canvas></div></div>
-    <div class="subhead">Top entradas</div>
+    <div class="subhead">Casamentos · parcelas <span class="info" id="noivasListInfo"></span></div>
     <div class="card"><div class="row-list" id="noivasTop"></div></div>
+    <div class="subhead">Custos da operação Noivas</div>
+    <div class="card"><div class="row-list" id="noivasDespesas"></div></div>
   </section>
 
   <!-- CURSOS -->
@@ -1056,7 +1072,13 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
         <button class="btn-secondary" id="fClear" style="margin-left:auto">Limpar filtros</button>
       </div>
     </details>
-    <div class="lanc-table-wrap">
+    <div class="lanc-view-toggle" style="display:flex;gap:6px;align-items:center;margin:6px 0 8px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--cp-text-soft);font-weight:600">Visualização:</span>
+      <button type="button" class="lv-btn active" data-view="compact">☰ Compacta</button>
+      <button type="button" class="lv-btn" data-view="table">▦ Tabela</button>
+      <span style="margin-left:auto;font-size:12px;color:var(--cp-text-soft)"></span>
+    </div>
+    <div class="lanc-table-wrap" id="lancTableWrap">
       <table class="lanc-table" id="lancTable">
         <thead><tr>
           <th data-sort="data"        style="width:78px"  data-default-w="78">Data<span class="sort-ind">▼</span><span class="resize-handle"></span></th>
@@ -1072,6 +1094,9 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
         </tr></thead>
         <tbody id="lancTbody"></tbody>
       </table>
+    </div>
+    <div class="lanc-compact-wrap" id="lancCompactWrap">
+      <div class="row-list" id="lancList"></div>
     </div>
     <div style="text-align:center;margin-top:12px">
       <button class="p-chip" id="lancMore" style="display:none"></button>
@@ -1151,7 +1176,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 10:19</span> · <span id="recCount"></span> lançamentos · v4.8.0 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 12:06</span> · <span id="recCount"></span> lançamentos · v4.9.0 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1379,6 +1404,31 @@ const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(
 function colorFor(name, i){ return COLORS[i % COLORS.length]; }
 function hashColor(s){ let h=0; for(const c of s) h = (h*31 + c.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; }
 function isNoivasArea(a){ return a==='Noivas' || (a||'').toLowerCase().includes('noivas'); }
+function isNoivasRecord(r){
+  // Noivas tab excludes Hotmart course revenue (it belongs to Cursos)
+  if(!isNoivasArea(r.area)) return false;
+  if((r.bucket||'')==='RECEITA - Cursos Online (BN/BBP)') return false;
+  return true;
+}
+function extractNoivaName(desc){
+  if(!desc) return null;
+  let s = String(desc).trim();
+  // strip leading qualifiers
+  s = s.replace(/^retoque\s+noiva\s+/i,'')
+       .replace(/^retoque\s+/i,'')
+       .replace(/^hora\s+extra\s+acompanhamento\s+noiva\s+/i,'')
+       .replace(/^acompanhamento\s+noiva\s+/i,'')
+       .replace(/^pix\s+/i,'')
+       .replace(/^noiva\s+/i,'');
+  // cut at em-dash, en-dash, hyphen separator, date, parenthesis
+  s = s.split(/\s+[–—-]\s+/)[0];
+  s = s.split(/\s+\d{1,2}\/\d{1,2}/)[0];
+  s = s.split(/\s+\(/)[0];
+  s = s.trim();
+  if(!s) return null;
+  // Title-case-ish: capitalize first letter of each word
+  return s.split(/\s+/).map(w => w.length ? w[0].toUpperCase()+w.slice(1).toLowerCase() : w).join(' ');
+}
 function isCursoArea(a){ if(!a) return false; const s=a.toLowerCase(); return s.startsWith('curso') || s.includes('curso noivas') || s.includes('curso técnica') || s.includes('curso tecnica'); }
 
 /* ===================== STATE ===================== */
@@ -2292,31 +2342,95 @@ function renderDRE(){
 
 /* ===================== NOIVAS ===================== */
 function renderNoivas(){
-  const all = recordsInPeriod().filter(r => isNoivasArea(r.area));
-  const prev = previousPeriodRecords().filter(r => isNoivasArea(r.area));
-  const rec = sumRec(all), des = sumDes(all), net = rec-des;
-  const prevNet = sumRec(prev)-sumDes(prev);
-  document.getElementById('noivasNet').className = 'big '+(net>=0?'pos':'neg');
-  document.getElementById('noivasNetNum').textContent = ' '+Math.abs(net).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  document.getElementById('noivasDelta').outerHTML = `<span id="noivasDelta">${fmtDeltaBadge(net, prevNet, previousPeriodLabel())}</span>`;
-  document.getElementById('noivasReceita').textContent = fmtCompact(rec);
-  document.getElementById('noivasDespesa').textContent = fmtCompact(des);
-  const mv = Math.max(rec,des,1);
-  document.getElementById('noivasRecFill').style.width = (rec/mv*100)+'%';
-  document.getElementById('noivasDesFill').style.width = (des/mv*100)+'%';
+  const all  = recordsInPeriod().filter(isNoivasRecord);
+  const prev = previousPeriodRecords().filter(isNoivasRecord);
+  const recRecs = all.filter(r => r.tipo==='Receita');
+  const desRecs = all.filter(r => r.tipo==='Despesa');
+  const rec = sumRec(all), des = sumDes(all);
 
-  const series = sumByMonthSeries(all);
-  const labels = series.map(s=>{const [y,m]=s.key.split('-');return MONTHS_ABR[parseInt(m,10)-1]+'/'+y.slice(2)});
-  mkChart('chartNoivasMes', trendChartConfig(labels, series.map(s=>s.r), series.map(s=>s.d), labels.length>12?'line':'bar'));
+  // Group receitas by noiva name extracted from description
+  const byNoiva = new Map();
+  for(const r of recRecs){
+    const name = extractNoivaName(r.descricao) || '(sem nome identificado)';
+    if(!byNoiva.has(name)) byNoiva.set(name, { name, total:0, parcelas:[] });
+    const b = byNoiva.get(name);
+    b.total += r.valor;
+    b.parcelas.push(r);
+  }
+  const noivas = [...byNoiva.values()].sort((a,b) => b.total - a.total);
+  const nCount  = noivas.filter(n => n.name !== '(sem nome identificado)').length;
+  const ticket  = nCount > 0 ? rec / nCount : 0;
 
-  const top = all.filter(r=>r.tipo==='Receita').sort((a,b)=>b.valor-a.valor).slice(0,12);
-  document.getElementById('noivasTop').innerHTML = top.map(r => {
-    const c = hashColor(r.categoria||r.descricao||'');
-    return `<div class="row"><span class="swatch" style="background:${c}"></span><div class="left">
-      <div class="name">${escapeHtml(r.descricao||r.categoria||'(sem desc.)')}</div>
-      <div class="meta">${formatDate(r.data)} · ${escapeHtml(r.categoria||'')}</div></div>
-      <div class="amt pos">${fmt(r.valor)}</div></div>`;
-  }).join('') || '<div class="empty">Sem entradas no período.</div>';
+  // Previous period: same dynamic for delta
+  const prevByNoiva = new Map();
+  for(const r of prev.filter(r => r.tipo==='Receita')){
+    const name = extractNoivaName(r.descricao) || '(sem nome)';
+    prevByNoiva.set(name, (prevByNoiva.get(name)||0) + r.valor);
+  }
+
+  document.getElementById('noivasNet').className = 'big pos';
+  document.getElementById('noivasNetNum').textContent = ' '+rec.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('noivasDelta').outerHTML = `<span id="noivasDelta">${fmtDeltaBadge(rec, sumRec(prev), previousPeriodLabel())}</span>`;
+  document.getElementById('noivasCount').textContent = nCount + (nCount===1 ? ' casamento' : ' casamentos');
+  document.getElementById('noivasTicket').textContent = fmtCompact(ticket);
+  document.getElementById('noivasRecFill').style.width = '100%';
+  document.getElementById('noivasDesFill').style.width = (ticket && noivas[0] ? Math.min(100, ticket/noivas[0].total*100) : 0)+'%';
+
+  // Horizontal-style bar chart: top 15 noivas
+  const top = noivas.slice(0, 15);
+  const labels = top.map(n => n.name.length>22 ? n.name.slice(0,21)+'…' : n.name);
+  const data   = top.map(n => n.total);
+  const colors = top.map(n => hashColor(n.name));
+  mkChart('chartNoivasMes', {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Recebido', data, backgroundColor:colors, borderRadius:6, maxBarThickness:24 }] },
+    options:{
+      indexAxis:'y',
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>` ${fmt(c.parsed.x)}` } } },
+      scales:{
+        x:{ ticks:{ callback:v=>fmtCompact(v) }, grid:{ color:'rgba(0,0,0,.06)' } },
+        y:{ grid:{ display:false } }
+      },
+      onClick:(_e, els)=>{
+        if(!els.length) return;
+        const n = top[els[0].index];
+        openDrill('Casamento · '+n.name, n.parcelas);
+      }
+    }
+  });
+
+  // List of brides with parcelas
+  document.getElementById('noivasListInfo').textContent = `${noivas.length} casamento${noivas.length===1?'':'s'} no período`;
+  document.getElementById('noivasTop').innerHTML = noivas.map(n => {
+    const c = hashColor(n.name);
+    const dts = n.parcelas.map(p => p.data).sort();
+    const first = dts[0], last = dts[dts.length-1];
+    const datesLabel = first === last ? formatDate(first) : `${formatDate(first)} → ${formatDate(last)}`;
+    return `<div class="row" data-noiva="${escapeHtml(n.name)}"><span class="swatch" style="background:${c}"></span><div class="left">
+      <div class="name">${escapeHtml(n.name)}</div>
+      <div class="meta">${n.parcelas.length} parcela${n.parcelas.length===1?'':'s'} · ${datesLabel}</div></div>
+      <div class="amt pos">${fmt(n.total)}</div></div>`;
+  }).join('') || '<div class="empty">Sem casamentos no período.</div>';
+  document.querySelectorAll('#noivasTop .row[data-noiva]').forEach(el => {
+    el.addEventListener('click', () => {
+      const name = el.dataset.noiva;
+      const n = noivas.find(x => x.name === name);
+      if(n) openDrill('Casamento · '+name, n.parcelas);
+    });
+  });
+
+  // Despesas list (operational costs)
+  const desTop = desRecs.slice().sort((a,b) => b.valor - a.valor).slice(0, 10);
+  document.getElementById('noivasDespesas').innerHTML = desTop.length
+    ? desTop.map(r => {
+        const c = hashColor(r.categoria||r.descricao||'');
+        return `<div class="row"><span class="swatch" style="background:${c}"></span><div class="left">
+          <div class="name">${escapeHtml(r.descricao||r.categoria||'(sem desc.)')}</div>
+          <div class="meta">${formatDate(r.data)} · ${escapeHtml(r.categoria||r.sub||'')}</div></div>
+          <div class="amt neg">-${fmt(r.valor)}</div></div>`;
+      }).join('') + `<div class="empty" style="margin-top:8px;text-align:right">Custos totais no período: <strong>${fmt(des)}</strong></div>`
+    : '<div class="empty">Sem custos no período.</div>';
 }
 
 /* ===================== CURSOS ===================== */
@@ -2485,6 +2599,7 @@ function renderAreas(){
 /* ===================== LANCAMENTOS ===================== */
 let lancShown = 60;
 let lancSort = { key: 'data', dir: 'desc' };
+let lancView = (typeof localStorage!=='undefined' && localStorage.getItem('lancView')) || 'compact';
 const lancFilter = {
   tipos: new Set(),
   areas: new Set(),
@@ -2588,10 +2703,21 @@ function getFilteredLanc(baseRecs){
       || (r.responsavel||'').toLowerCase().includes(q))
     .sort(cmp);
 }
+function applyLancView(){
+  const tw = document.getElementById('lancTableWrap');
+  const cw = document.getElementById('lancCompactWrap');
+  if(!tw || !cw) return;
+  tw.style.display = (lancView === 'table')   ? 'block' : 'none';
+  cw.style.display = (lancView === 'compact') ? 'block' : 'none';
+  document.querySelectorAll('.lv-btn[data-view]').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === lancView);
+  });
+}
 function applyLancFilter(baseRecs){
   baseRecs = baseRecs || recordsInPeriod();
   const filtered = getFilteredLanc(baseRecs);
   const show = filtered.slice(0,lancShown);
+  // ---- TABLE view ----
   const tbody = document.getElementById('lancTbody');
   if(!show.length){
     tbody.innerHTML = `<tr><td colspan="10" class="lanc-empty">Nenhum lançamento encontrado.</td></tr>`;
@@ -2618,12 +2744,39 @@ function applyLancFilter(baseRecs){
       </tr>`;
     }).join('');
   }
+  // ---- COMPACT view ----
+  const list = document.getElementById('lancList');
+  if(list){
+    if(!show.length){
+      list.innerHTML = `<div class="empty">Nenhum lançamento encontrado.</div>`;
+    } else {
+      list.innerHTML = show.map(r => {
+        const sign = r.tipo==='Receita'?'pos':'neg';
+        const sv = (r.tipo==='Receita'?'+':'-') + fmt(r.valor).replace('-','');
+        const c = hashColor(r.bucket||r.area||r.categoria||'');
+        const bk = r.bucket ? `<span class="bk-chip" style="background:${c}22;color:${c}">${escapeHtml(r.bucket)}</span>` : '';
+        const parts = [formatDate(r.data)];
+        if(r.sub) parts.push(escapeHtml(r.sub));
+        if(r.categoria) parts.push(escapeHtml(r.categoria));
+        if(r.conta) parts.push(escapeHtml(r.conta));
+        return `<div class="row">
+          <span class="swatch" style="background:${c}"></span>
+          <div class="left">
+            <div class="name">${escapeHtml(r.descricao||'(sem descrição)')}</div>
+            <div class="meta">${bk}${parts.join(' · ')}</div>
+          </div>
+          <div class="amt ${sign}">${sv}</div>
+        </div>`;
+      }).join('');
+    }
+  }
   const more = document.getElementById('lancMore');
   if(filtered.length>lancShown){ more.style.display='inline-block'; more.textContent=`Carregar mais (${filtered.length-lancShown} restantes)`; }
   else more.style.display='none';
   document.getElementById('lancCount').textContent = `${filtered.length} de ${baseRecs.length}`;
   updateSortIndicators();
   refreshFilterBadge();
+  applyLancView();
 }
 function updateSortIndicators(){
   document.querySelectorAll('#lancTable thead th').forEach(th => {
@@ -2675,6 +2828,13 @@ function setupLancTableInteractions(){
   });
 }
 document.getElementById('fSearch').addEventListener('input', ()=>{lancShown=60;applyLancFilter();});
+document.querySelectorAll('.lv-btn[data-view]').forEach(b => {
+  b.addEventListener('click', () => {
+    lancView = b.dataset.view;
+    try{ localStorage.setItem('lancView', lancView); }catch(_){}
+    applyLancFilter();
+  });
+});
 document.addEventListener('click', () => document.querySelectorAll('.ms-pop.open').forEach(p=>p.classList.remove('open')));
 document.getElementById('lancMore').addEventListener('click', ()=>{lancShown+=120;applyLancFilter();});
 document.getElementById('fClear').addEventListener('click', () => {
@@ -2759,7 +2919,7 @@ document.getElementById('exportXlsx').addEventListener('click', exportXlsxLanc);
 
 /* ===================== COMPARISON NOIVAS vs CURSOS ===================== */
 function renderComparison(recs){
-  const noivas = recs.filter(r => isNoivasArea(r.area));
+  const noivas = recs.filter(isNoivasRecord);
   const cursos = recs.filter(r => isCursoArea(r.area));
   const allKeys = new Set([...sumByMonthSeries(noivas), ...sumByMonthSeries(cursos)].map(s=>s.key));
   const keys = [...allKeys].sort();
