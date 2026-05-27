@@ -1190,7 +1190,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:00</span> · <span id="recCount"></span> lançamentos · v4.9.3 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:14</span> · <span id="recCount"></span> lançamentos · v4.9.4 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -2685,7 +2685,7 @@ function renderLanc(){
   buildMultiSelect('fTipoBtn','fTipoPop', ['Receita','Despesa'], 'Todos os tipos', lancFilter.tipos);
   const MESES_ABR = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const periodOpts = [...new Set(LANCAMENTOS.map(r => (r.data||'').slice(0,7)).filter(Boolean))]
-    .sort().reverse()
+    .sort()
     .map(ym => `${MESES_ABR[parseInt(ym.slice(5,7),10)-1]}/${ym.slice(0,4)}`);
   buildMultiSelect('fPeriodoBtn','fPeriodoPop', periodOpts, 'Todos os períodos', lancFilter.periodos);
   buildMultiSelect('fBucketBtn','fBucketPop', uniq('bucket'), 'Todos os buckets', lancFilter.buckets);
