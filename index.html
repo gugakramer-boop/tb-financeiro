@@ -766,6 +766,16 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 .lanc-totals .lt-v.pos{color:var(--cp-success)}
 .lanc-totals .lt-v.neg{color:var(--cp-danger)}
 @media (max-width:640px){.lanc-totals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.goals-examples{margin:0 0 14px;border:1px solid var(--cp-border);border-radius:12px;background:var(--cp-surface);overflow:hidden}
+.goals-examples>summary{cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:var(--cp-accent);list-style:none;user-select:none}
+.goals-examples>summary::-webkit-details-marker{display:none}
+.goals-examples>summary::after{content:' ▾';color:var(--cp-text-soft)}
+.goals-examples[open]>summary::after{content:' ▴'}
+.goals-examples .ge-body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--cp-border)}
+.goals-examples .ge-card{padding:10px 12px;border-radius:10px;background:var(--cp-bg-elevated);border:1px solid var(--cp-border)}
+.goals-examples .ge-title{font-size:13px;font-weight:600;color:var(--cp-text);margin-bottom:6px}
+.goals-examples .ge-card ul{margin:4px 0 6px 18px;padding:0;font-size:12.5px;color:var(--cp-text);line-height:1.55}
+.goals-examples .ge-tip{font-size:11.5px;color:var(--cp-text-soft);font-style:italic}
 </style>
 </head>
 <body class="locked">
@@ -1166,6 +1176,46 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <button class="modal-close" id="goalsClose" aria-label="Fechar">×</button>
     </div>
     <div class="modal-body">
+      <details class="goals-examples">
+        <summary>💡 Clique aqui para ver exemplos de metas</summary>
+        <div class="ge-body">
+          <div class="ge-card">
+            <div class="ge-title">🌱 Conservadora — pra começar com tranquilidade</div>
+            <ul>
+              <li>Receita: <b>R$ 25.000/mês</b> (próxima da média atual)</li>
+              <li>Lucro: <b>R$ 8.000/mês</b> (≈30% de margem)</li>
+              <li>Limite de despesa: <b>R$ 18.000/mês</b></li>
+            </ul>
+            <div class="ge-tip">Boa quando o foco é estabilidade — manter o que já funciona e gerar reserva.</div>
+          </div>
+          <div class="ge-card">
+            <div class="ge-title">🚀 De crescimento — pra alavancar o negócio</div>
+            <ul>
+              <li>Receita: <b>R$ 40.000/mês</b> (≈+30% vs hoje)</li>
+              <li>Lucro: <b>R$ 14.000/mês</b> (≈35% de margem)</li>
+              <li>Limite de despesa: <b>R$ 26.000/mês</b> (cabe investimento em divulgação)</li>
+            </ul>
+            <div class="ge-tip">Use quando há campanha nova, lançamento de produto ou expansão prevista.</div>
+          </div>
+          <div class="ge-card">
+            <div class="ge-title">💎 Premium — pra maximizar lucro</div>
+            <ul>
+              <li>Receita: <b>R$ 50.000/mês</b></li>
+              <li>Lucro: <b>R$ 22.500/mês</b> (≈45% de margem)</li>
+              <li>Limite de despesa: <b>R$ 27.500/mês</b></li>
+            </ul>
+            <div class="ge-tip">Foco em pacotes de alto ticket, menos volume, margem maior.</div>
+          </div>
+          <div class="ge-card">
+            <div class="ge-title">🧮 Como pensar nos números</div>
+            <ul>
+              <li><b>Receita</b>: olha sua média dos últimos 6 meses e adiciona um % de crescimento (ex.: +20%).</li>
+              <li><b>Lucro</b>: receita × margem desejada (30–45% é típico pra serviços).</li>
+              <li><b>Limite de despesa</b>: receita − lucro. Se passar, você é avisada.</li>
+            </ul>
+          </div>
+        </div>
+      </details>
       <div class="form-row">
         <label>Meta de receita por mês</label>
         <input type="number" id="goalReceita" placeholder="Ex: 30000" min="0" step="100">
@@ -1225,7 +1275,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:38</span> · <span id="recCount"></span> lançamentos · v4.9.7 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 14:59</span> · <span id="recCount"></span> lançamentos · v4.9.8 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -3724,7 +3774,7 @@ let whatIfState = {};
 function openWhatIf(){
   const recs = recordsInPeriod();
   const byA = {};
-  for(const r of recs){ if(r.tipo==='Despesa'){ const a=r.area||'(sem área)'; byA[a]=(byA[a]||0)+(+r.valor||0); } }
+  for(const r of recs){ if(r.tipo==='Despesa'){ const a=r.bucket||r.area||'(sem bucket)'; byA[a]=(byA[a]||0)+(+r.valor||0); } }
   const top = Object.entries(byA).sort((a,b)=>b[1]-a[1]).slice(0,5);
   whatIfState = {};
   top.forEach(([a])=>whatIfState[a]=0);
