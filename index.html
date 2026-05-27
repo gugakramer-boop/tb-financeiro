@@ -743,6 +743,13 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 .lanc-compact-wrap .row .amt{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;font-size:13px}
 .lanc-compact-wrap .row .swatch{flex-shrink:0;width:10px;height:34px;border-radius:3px}
 .lanc-compact-wrap .row .bk-chip{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;font-weight:600;margin-right:6px;vertical-align:baseline}
+.lanc-totals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:12px;padding:12px 14px}
+.lanc-totals .lt-cell{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lanc-totals .lt-l{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--cp-text-soft);font-weight:700}
+.lanc-totals .lt-v{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;color:var(--cp-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lanc-totals .lt-v.pos{color:var(--cp-success)}
+.lanc-totals .lt-v.neg{color:var(--cp-danger)}
+@media (max-width:640px){.lanc-totals{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body class="locked">
@@ -1098,6 +1105,12 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
     <div class="lanc-compact-wrap" id="lancCompactWrap">
       <div class="row-list" id="lancList"></div>
     </div>
+    <div class="lanc-totals" id="lancTotals">
+      <div class="lt-cell"><span class="lt-l">Receitas</span><span class="lt-v pos" id="ltRec">R$ 0,00</span></div>
+      <div class="lt-cell"><span class="lt-l">Despesas</span><span class="lt-v neg" id="ltDes">R$ 0,00</span></div>
+      <div class="lt-cell"><span class="lt-l">Líquido</span><span class="lt-v" id="ltNet">R$ 0,00</span></div>
+      <div class="lt-cell"><span class="lt-l">Itens</span><span class="lt-v" id="ltN">0</span></div>
+    </div>
     <div style="text-align:center;margin-top:12px">
       <button class="p-chip" id="lancMore" style="display:none"></button>
     </div>
@@ -1176,7 +1189,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 12:06</span> · <span id="recCount"></span> lançamentos · v4.9.0 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 12:20</span> · <span id="recCount"></span> lançamentos · v4.9.1 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -2774,6 +2787,14 @@ function applyLancFilter(baseRecs){
   if(filtered.length>lancShown){ more.style.display='inline-block'; more.textContent=`Carregar mais (${filtered.length-lancShown} restantes)`; }
   else more.style.display='none';
   document.getElementById('lancCount').textContent = `${filtered.length} de ${baseRecs.length}`;
+  // Totals footer (computed on the FULL filtered set, not just shown page)
+  const totRec = filtered.reduce((s,r)=> s + (r.tipo==='Receita' ? r.valor : 0), 0);
+  const totDes = filtered.reduce((s,r)=> s + (r.tipo==='Despesa' ? r.valor : 0), 0);
+  const totNet = totRec - totDes;
+  const elRec = document.getElementById('ltRec'); if(elRec) elRec.textContent = '+'+fmt(totRec).replace('-','');
+  const elDes = document.getElementById('ltDes'); if(elDes) elDes.textContent = '-'+fmt(totDes).replace('-','');
+  const elNet = document.getElementById('ltNet'); if(elNet){ elNet.textContent = fmt(totNet); elNet.className = 'lt-v ' + (totNet>=0?'pos':'neg'); }
+  const elN   = document.getElementById('ltN');   if(elN)   elN.textContent   = filtered.length.toLocaleString('pt-BR');
   updateSortIndicators();
   refreshFilterBadge();
   applyLancView();
