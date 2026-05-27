@@ -1091,7 +1091,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 08:13</span> · <span id="recCount"></span> lançamentos · v4.7.2 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 08:21</span> · <span id="recCount"></span> lançamentos · v4.7.3 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1323,9 +1323,12 @@ function isCursoArea(a){ if(!a) return false; const s=a.toLowerCase(); return s.
 
 /* ===================== STATE ===================== */
 const years = [...new Set(LANCAMENTOS.map(r => r.data.slice(0,4)))].sort();
+const _now = new Date();
+const _curYear = String(_now.getFullYear());
+const _defaultYear = years.includes(_curYear) ? _curYear : years[years.length-1];
 const state = {
-  years: [years[years.length-1]],  // array of selected years (≥1)
-  months: [],                       // array of month indices 0..11; empty = todos
+  years: [_defaultYear],            // array of selected years (≥1); default = ano atual
+  months: [_now.getMonth()],        // array of month indices 0..11; default = mês atual
   preset: null,                     // 'ytd' | 'last3' | 'last6' | 'all' | null
   tab: 'resumo',
 };
