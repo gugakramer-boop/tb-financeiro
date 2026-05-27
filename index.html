@@ -352,10 +352,26 @@ html[data-theme="dark"] .delta.neg{background:rgba(248,113,113,0.14)}
   padding-bottom:calc(20px + env(safe-area-inset-bottom));
   box-shadow:var(--cp-shadow);
   transform:translateY(30px); transition:transform .25s ease;
+  display:flex; flex-direction:column; max-height:92vh;
 }
 .sheet-bg.open .sheet{transform:none}
-@media(min-width:700px){.sheet{border-radius:22px;margin-bottom:20px}.sheet-bg{align-items:center;padding:20px}}
+@media(min-width:700px){.sheet{border-radius:22px;margin-bottom:20px;max-height:85vh}.sheet-bg{align-items:center;padding:20px}}
 .sheet h4{margin:14px 4px 8px;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--cp-text-soft);font-weight:600}
+.sheet-head{padding:0 0 6px;border-bottom:1px solid var(--cp-border);margin-bottom:4px}
+.sheet-head-row{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 6px;gap:10px}
+.sheet-head-row h3{margin:0;font-size:16px;font-weight:600;color:var(--cp-text);display:flex;align-items:baseline;gap:8px;flex:1;min-width:0}
+.sheet-preview{font-size:12px;font-weight:500;color:var(--cp-accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-body{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 2px;min-height:0}
+.sheet-foot{display:flex;gap:10px;padding:12px 0 0;border-top:1px solid var(--cp-border);margin-top:12px;flex:0 0 auto}
+.sheet-foot button{flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin:0}
+.sheet-foot .btn-ghost{background:var(--cp-surface);border:1px solid var(--cp-border);color:var(--cp-text);width:auto}
+.sheet-advanced{margin-top:12px;border:1px solid var(--cp-border);border-radius:10px;padding:6px 10px 10px;background:var(--cp-surface)}
+.sheet-advanced>summary{cursor:pointer;font-size:12px;color:var(--cp-text-soft);font-weight:600;padding:4px 0;list-style:none;user-select:none}
+.sheet-advanced>summary::-webkit-details-marker{display:none}
+.sheet-advanced>summary::before{content:'+ ';color:var(--cp-accent);font-weight:700}
+.sheet-advanced[open]>summary::before{content:'− '}
+.sheet-advanced .month-grid{margin-top:4px;grid-template-columns:repeat(2,1fr)}
+.hint-inline{font-weight:400;font-size:11px;color:var(--cp-text-soft);text-transform:none;letter-spacing:0}
 .year-chips,.month-grid,.preset-grid{display:flex;gap:6px;flex-wrap:wrap}
 .month-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .preset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
@@ -1175,24 +1191,41 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 <!-- Period sheet -->
 <div class="sheet-bg" id="sheetBg">
   <div class="sheet">
-    <div class="modal-handle"></div>
-    <h4>Ano</h4>
-    <div class="year-chips" id="sheetYears"></div>
-    <h4>Mês</h4>
-    <div class="month-grid" id="sheetMonths"></div>
-    <h4>Atalhos</h4>
-    <div class="preset-grid">
-      <button class="p-chip" data-preset="ytd">Ano até hoje</button>
-      <button class="p-chip" data-preset="last3">Últimos 3 meses</button>
-      <button class="p-chip" data-preset="last6">Últimos 6 meses</button>
-      <button class="p-chip" data-preset="all">Tudo</button>
+    <div class="sheet-head">
+      <div class="modal-handle"></div>
+      <div class="sheet-head-row">
+        <h3>Período <span class="sheet-preview" id="sheetPreview"></span></h3>
+        <button class="modal-close" id="sheetClose" aria-label="Fechar">×</button>
+      </div>
     </div>
-    <h4>Meses específicos <span style="font-weight:400;font-size:11px;color:var(--cp-text-soft)">(combine qualquer mês/ano)</span></h4>
-    <div class="month-grid" id="sheetPeriods"></div>
+    <div class="sheet-body">
+      <h4>Atalhos</h4>
+      <div class="preset-grid">
+        <button class="p-chip" data-preset="thismonth">Este mês</button>
+        <button class="p-chip" data-preset="ytd">Ano até hoje</button>
+        <button class="p-chip" data-preset="last3">Últimos 3 meses</button>
+        <button class="p-chip" data-preset="last6">Últimos 6 meses</button>
+        <button class="p-chip" data-preset="yoy">Ano vs ano anterior</button>
+        <button class="p-chip" data-preset="all">Tudo</button>
+      </div>
+      <h4>Ano</h4>
+      <div class="year-chips" id="sheetYears"></div>
+      <h4>Meses <span class="hint-inline">(do ano selecionado)</span></h4>
+      <div class="month-grid" id="sheetMonths"></div>
+      <details class="sheet-advanced">
+        <summary>Combinar meses de anos diferentes (avançado)</summary>
+        <div class="hint-inline" style="display:block;margin:6px 0 8px">Ex.: Dez/2025 + Jan/2026. Substitui ano/mês acima.</div>
+        <div class="month-grid" id="sheetPeriods"></div>
+      </details>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn-ghost" id="sheetCancel">Cancelar</button>
+      <button class="btn-primary" id="sheetApply">Aplicar</button>
+    </div>
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:18</span> · <span id="recCount"></span> lançamentos · v4.9.5 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:25</span> · <span id="recCount"></span> lançamentos · v4.9.6 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1615,20 +1648,86 @@ function previousPeriodLabel(){
 
 /* ===================== PERIOD SHEET ===================== */
 const sheetBg = document.getElementById('sheetBg');
-document.getElementById('periodBtn').addEventListener('click', () => { renderSheet(); sheetBg.classList.add('open'); document.body.classList.add('sheet-open'); });
-sheetBg.addEventListener('click', e => { if(e.target===sheetBg){ sheetBg.classList.remove('open'); document.body.classList.remove('sheet-open'); } });
+let pendingState = null;
+
+function snapshotState(){
+  return {
+    years: state.years.slice(),
+    months: state.months.slice(),
+    preset: state.preset,
+    periods: (state.periods||[]).slice(),
+  };
+}
+function openSheet(){
+  pendingState = snapshotState();
+  renderSheet();
+  sheetBg.classList.add('open');
+  document.body.classList.add('sheet-open');
+}
+function closeSheet(){
+  pendingState = null;
+  sheetBg.classList.remove('open');
+  document.body.classList.remove('sheet-open');
+}
+function applySheet(){
+  if(!pendingState){ closeSheet(); return; }
+  state.years = pendingState.years.slice();
+  state.months = pendingState.months.slice();
+  state.preset = pendingState.preset;
+  state.periods = pendingState.periods.slice();
+  closeSheet();
+  refreshAll();
+}
+
+document.getElementById('periodBtn').addEventListener('click', openSheet);
+sheetBg.addEventListener('click', e => { if(e.target===sheetBg) closeSheet(); });
+document.getElementById('sheetClose').addEventListener('click', closeSheet);
+document.getElementById('sheetCancel').addEventListener('click', closeSheet);
+document.getElementById('sheetApply').addEventListener('click', applySheet);
+document.addEventListener('keydown', e => { if(e.key==='Escape' && sheetBg.classList.contains('open')) closeSheet(); });
+
+function previewLabel(p){
+  if(p.periods && p.periods.length){
+    const sorted = p.periods.slice().sort();
+    const fmt = ym => { const [y,m] = ym.split('-'); return MONTHS_ABR[parseInt(m,10)-1]+'/'+y; };
+    if(sorted.length===1) return fmt(sorted[0]);
+    if(sorted.length<=3) return sorted.map(fmt).join(' · ');
+    return sorted.length+' meses ('+fmt(sorted[0])+' – '+fmt(sorted[sorted.length-1])+')';
+  }
+  if(p.preset==='all') return 'Todo o histórico';
+  if(p.preset==='ytd') return 'Ano até hoje';
+  if(p.preset==='last3') return 'Últimos 3 meses';
+  if(p.preset==='last6') return 'Últimos 6 meses';
+  if(p.preset==='thismonth') return MONTHS_FULL[_now.getMonth()]+' de '+_curYear;
+  if(p.preset==='yoy') return _curYear+' vs '+(parseInt(_curYear,10)-1);
+  const ys = p.years.slice().sort();
+  const yl = ys.length===1?ys[0]:(ys.length+' anos');
+  if(p.months && p.months.length){
+    const ms = p.months.slice().sort((a,b)=>a-b);
+    const ml = ms.length===1?MONTHS_FULL[ms[0]]:(ms.length+' meses');
+    return ml+' · '+yl;
+  }
+  return ys.length===1?('Ano '+yl):('Anos '+yl);
+}
 
 function renderSheet(){
-  const ySel = new Set(state.years);
-  const mSel = new Set(state.months);
-  const pSel = new Set(state.periods||[]);
+  if(!pendingState) pendingState = snapshotState();
+  const p = pendingState;
+  const ySel = new Set(p.years);
+  const mSel = new Set(p.months);
+  const pSel = new Set(p.periods||[]);
   const periodsActive = pSel.size>0;
+  const ymActive = !periodsActive && !p.preset;
+
+  document.getElementById('sheetPreview').textContent = '· ' + previewLabel(p);
+
   document.getElementById('sheetYears').innerHTML = years.map(y =>
-    `<button class="p-chip ${(!periodsActive && !state.preset && ySel.has(y))?'active':''}" data-y="${y}">${y}</button>`
+    `<button class="p-chip ${(ymActive && ySel.has(y))?'active':''}" data-y="${y}">${y}</button>`
   ).join('');
   document.getElementById('sheetMonths').innerHTML =
-    `<button class="p-chip ${(!periodsActive && state.months.length===0 && !state.preset)?'active':''}" data-m="all">Todos</button>` +
-    MONTHS_ABR.map((m,i) => `<button class="p-chip ${(!periodsActive && mSel.has(i) && !state.preset)?'active':''}" data-m="${i}">${m}</button>`).join('');
+    `<button class="p-chip ${(ymActive && p.months.length===0)?'active':''}" data-m="all">Ano todo</button>` +
+    MONTHS_ABR.map((m,i) => `<button class="p-chip ${(ymActive && mSel.has(i))?'active':''}" data-m="${i}">${m}</button>`).join('');
+
   const allPeriods = [...new Set(LANCAMENTOS.map(r => (r.data||'').slice(0,7)).filter(Boolean))].sort();
   const sp = document.getElementById('sheetPeriods');
   if(sp){
@@ -1639,41 +1738,59 @@ function renderSheet(){
     }).join('');
     sp.querySelectorAll('.p-chip').forEach(b => b.addEventListener('click', () => {
       const ym = b.dataset.p;
-      state.preset = null;
-      const cur = new Set(state.periods||[]);
+      p.preset = null;
+      const cur = new Set(p.periods||[]);
       if(cur.has(ym)) cur.delete(ym); else cur.add(ym);
-      state.periods = [...cur].sort();
-      renderSheet(); refreshAll();
+      p.periods = [...cur].sort();
+      renderSheet();
     }));
   }
+
   document.querySelectorAll('#sheetYears .p-chip').forEach(b => b.addEventListener('click', () => {
     const y = b.dataset.y;
-    state.periods = [];
-    if(state.preset){ state.preset=null; state.years=[y]; state.months=[]; }
+    p.periods = [];
+    if(p.preset){ p.preset=null; p.years=[y]; p.months=[]; }
     else if(ySel.has(y)){
-      if(state.years.length===1){ toast('Pelo menos 1 ano precisa ficar selecionado'); return; }
-      state.years = state.years.filter(x=>x!==y);
-    } else { state.years = [...state.years, y]; }
-    renderSheet(); refreshAll();
+      if(p.years.length===1){ toast('Pelo menos 1 ano precisa ficar selecionado'); return; }
+      p.years = p.years.filter(x=>x!==y);
+    } else { p.years = [...p.years, y]; }
+    renderSheet();
   }));
   document.querySelectorAll('#sheetMonths .p-chip').forEach(b => b.addEventListener('click', () => {
     const v = b.dataset.m;
-    state.periods = [];
-    if(state.preset){ state.preset=null; state.years = state.years.length?state.years:[years[years.length-1]]; state.months=[]; }
-    if(v==='all'){ state.months = []; }
+    p.periods = [];
+    if(p.preset){ p.preset=null; p.years = p.years.length?p.years:[_defaultYear]; p.months=[]; }
+    if(v==='all'){ p.months = []; }
     else {
       const i = parseInt(v,10);
-      if(mSel.has(i)) state.months = state.months.filter(x=>x!==i);
-      else state.months = [...state.months, i];
+      if(mSel.has(i)) p.months = p.months.filter(x=>x!==i);
+      else p.months = [...p.months, i];
     }
-    renderSheet(); refreshAll();
+    renderSheet();
   }));
   document.querySelectorAll('.preset-grid .p-chip').forEach(b => {
-    b.classList.toggle('active', !periodsActive && state.preset===b.dataset.preset);
+    b.classList.toggle('active', !periodsActive && p.preset===b.dataset.preset);
   });
 }
+
 document.querySelectorAll('.preset-grid .p-chip').forEach(b => b.addEventListener('click', () => {
-  state.periods = []; state.preset = b.dataset.preset; state.months=[]; renderSheet(); refreshAll(); setTimeout(()=>{sheetBg.classList.remove('open');document.body.classList.remove('sheet-open');},120);
+  if(!pendingState) pendingState = snapshotState();
+  const p = pendingState;
+  const k = b.dataset.preset;
+  p.periods = [];
+  if(k==='thismonth'){
+    p.preset = null;
+    p.years = [_defaultYear];
+    p.months = [_now.getMonth()];
+  } else if(k==='yoy'){
+    p.preset = null;
+    p.years = [_defaultYear];
+    p.months = [];
+  } else {
+    p.preset = k;
+    p.months = [];
+  }
+  renderSheet();
 }));
 
 /* ===================== TABS ===================== */
