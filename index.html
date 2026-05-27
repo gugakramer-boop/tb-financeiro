@@ -282,6 +282,17 @@ html[data-theme="dark"] .delta.neg{background:rgba(248,113,113,0.14)}
 
 /* ============ FILTERS ============ */
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters-collapse{margin-bottom:12px;border:1px solid var(--cp-border);border-radius:12px;background:var(--cp-surface);overflow:hidden}
+.filters-collapse>summary{list-style:none;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:600;color:var(--cp-text);display:flex;align-items:center;gap:8px;user-select:none}
+.filters-collapse>summary::-webkit-details-marker{display:none}
+.filters-collapse>summary::before{content:"+";display:inline-block;width:18px;height:18px;line-height:16px;text-align:center;border:1px solid var(--cp-border);border-radius:6px;font-weight:700;color:var(--cp-accent)}
+.filters-collapse[open]>summary::before{content:"−"}
+.filters-collapse .filter-count{margin-left:auto;font-size:11px;color:var(--cp-text-soft);font-weight:500}
+.filters-collapse .filters{padding:0 14px 12px;margin-bottom:0}
+.num-link{cursor:pointer;border-bottom:1px dashed transparent;transition:border-color .15s ease,color .15s ease}
+.num-link:hover{border-bottom-color:var(--cp-accent);color:var(--cp-accent)}
+.kpi.clickable,.hero-bar.clickable,.hero.clickable .big{cursor:pointer}
+.hero.clickable .big:hover{opacity:.85}
 .filters input,.filters select,.filters .ms-wrap{
   font-family:inherit; font-size:13px;
   flex:1; min-width:140px;
@@ -752,17 +763,17 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 
   <!-- RESUMO -->
   <section class="panel active" id="panel-resumo">
-    <div class="hero">
+    <div class="hero clickable" id="heroBox">
       <div class="eyebrow"><span class="dot"></span> <span id="heroLbl">Lucro líquido</span></div>
-      <div class="big" id="heroVal"><span class="cur">R$</span><span id="heroNum">—</span></div>
+      <div class="big num-link" id="heroVal" title="Clique para ver todos os lançamentos do período"><span class="cur">R$</span><span id="heroNum">—</span></div>
       <div><span class="delta neutral" id="heroDelta">—</span></div>
       <div class="hero-bars">
-        <div class="hero-bar income">
-          <div class="l">Receita</div><div class="v" id="hbRec">—</div>
+        <div class="hero-bar income clickable" id="hbRecBox" title="Clique para ver receitas">
+          <div class="l">Receita</div><div class="v num-link" id="hbRec">—</div>
           <div class="track"><div class="fill" id="hbRecFill" style="width:0"></div></div>
         </div>
-        <div class="hero-bar expense">
-          <div class="l">Despesa</div><div class="v" id="hbDes">—</div>
+        <div class="hero-bar expense clickable" id="hbDesBox" title="Clique para ver despesas">
+          <div class="l">Despesa</div><div class="v num-link" id="hbDes">—</div>
           <div class="track"><div class="fill" id="hbDesFill" style="width:0"></div></div>
         </div>
       </div>
@@ -795,26 +806,26 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
     <div class="insights" id="insights"></div>
 
     <div class="kpi-grid">
-      <div class="kpi income">
+      <div class="kpi income clickable" id="kpiReceitaBox">
         <div class="lbl"><span class="dot"></span> Receita</div>
-        <div class="val" id="kpiReceita">—</div>
+        <div class="val num-link" id="kpiReceita">—</div>
         <div class="sub" id="kpiReceitaSub"></div>
         <svg class="spark" id="sparkR" viewBox="0 0 52 24" preserveAspectRatio="none"></svg>
       </div>
-      <div class="kpi expense">
+      <div class="kpi expense clickable" id="kpiDespesaBox">
         <div class="lbl"><span class="dot"></span> Despesa</div>
-        <div class="val" id="kpiDespesa">—</div>
+        <div class="val num-link" id="kpiDespesa">—</div>
         <div class="sub" id="kpiDespesaSub"></div>
         <svg class="spark" id="sparkD" viewBox="0 0 52 24" preserveAspectRatio="none"></svg>
       </div>
-      <div class="kpi accent">
+      <div class="kpi accent clickable" id="kpiMargemBox">
         <div class="lbl"><span class="dot"></span> Margem</div>
-        <div class="val" id="kpiMargem">—</div>
+        <div class="val num-link" id="kpiMargem">—</div>
         <div class="sub" id="kpiMargemSub"></div>
       </div>
-      <div class="kpi neutral">
+      <div class="kpi neutral clickable" id="kpiItensBox">
         <div class="lbl"><span class="dot"></span> Lançamentos</div>
-        <div class="val" id="kpiItens">—</div>
+        <div class="val num-link" id="kpiItens">—</div>
         <div class="sub" id="kpiItensSub"></div>
       </div>
     </div>
@@ -964,20 +975,30 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <div class="spark-list" id="topDespesasSparks"></div>
     </div>
 
-    <div class="subhead">Receita por área</div>
+    <div class="subhead">Receita por <b>Bucket</b> <span class="info">nova taxonomia gerencial</span></div>
+    <div class="card">
+      <div class="chart-wrap short"><canvas id="chartAllBucketsR"></canvas></div>
+      <div id="listAllBucketsR" style="margin-top:8px"></div>
+    </div>
+    <div class="subhead">Despesa por <b>Bucket</b></div>
+    <div class="card">
+      <div class="chart-wrap short"><canvas id="chartAllBucketsD"></canvas></div>
+      <div id="listAllBucketsD" style="margin-top:8px"></div>
+    </div>
+    <div class="subhead">Despesa por <b>Sub-Categoria</b> <span class="info">Top 15</span></div>
+    <div class="card">
+      <div id="listAllSubsD" style="margin-top:4px"></div>
+    </div>
+
+    <div class="subhead" style="margin-top:18px">Receita por área <span class="info">visão antiga</span></div>
     <div class="card">
       <div class="chart-wrap short"><canvas id="chartAllAreasR"></canvas></div>
       <div id="listAllAreasR" style="margin-top:8px"></div>
     </div>
-    <div class="subhead">Despesa por área</div>
+    <div class="subhead">Despesa por área <span class="info">visão antiga</span></div>
     <div class="card">
       <div class="chart-wrap short"><canvas id="chartAllAreasD"></canvas></div>
       <div id="listAllAreasD" style="margin-top:8px"></div>
-    </div>
-    <div class="subhead">Despesa por <b>Bucket</b> <span class="info">nova taxonomia gerencial</span></div>
-    <div class="card">
-      <div class="chart-wrap short"><canvas id="chartAllBucketsD"></canvas></div>
-      <div id="listAllBucketsD" style="margin-top:8px"></div>
     </div>
   </section>
 
@@ -991,19 +1012,29 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
         <button class="btn-secondary" id="exportCsv">📥 CSV</button>
       </div>
     </div>
-    <div class="filters">
-      <input id="fSearch" placeholder="🔍 Buscar...">
-      <div class="ms-wrap"><button type="button" class="ms-btn" id="fTipoBtn" data-default="Todos os tipos">Todos os tipos</button><div class="ms-pop" id="fTipoPop"></div></div>
-      <div class="ms-wrap"><button type="button" class="ms-btn" id="fAreaBtn" data-default="Todas as áreas">Todas as áreas</button><div class="ms-pop" id="fAreaPop"></div></div>
-      <select id="fSort" class="sort">
-        <option value="data-desc">🗓️ Data ↓</option>
-        <option value="data-asc">🗓️ Data ↑</option>
-        <option value="valor-desc">💰 Valor ↓</option>
-        <option value="valor-asc">💰 Valor ↑</option>
-        <option value="area">📂 Área (A–Z)</option>
-        <option value="descricao">📝 Descrição (A–Z)</option>
-      </select>
-    </div>
+    <details class="filters-collapse" id="filtersBox">
+      <summary>Clique aqui para visualizar os filtros <span class="filter-count" id="filterCount"></span></summary>
+      <div class="filters">
+        <input id="fSearch" placeholder="🔍 Buscar descrição, área, categoria, bucket...">
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fTipoBtn" data-default="Todos os tipos">Todos os tipos</button><div class="ms-pop" id="fTipoPop"></div></div>
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fBucketBtn" data-default="Todos os buckets">Todos os buckets</button><div class="ms-pop" id="fBucketPop"></div></div>
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fSubBtn" data-default="Todas as sub-categorias">Todas as sub-categorias</button><div class="ms-pop" id="fSubPop"></div></div>
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fAreaBtn" data-default="Todas as áreas">Todas as áreas</button><div class="ms-pop" id="fAreaPop"></div></div>
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fCatBtn" data-default="Todas as categorias">Todas as categorias</button><div class="ms-pop" id="fCatPop"></div></div>
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fRespBtn" data-default="Todos os responsáveis">Todos os responsáveis</button><div class="ms-pop" id="fRespPop"></div></div>
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fContaBtn" data-default="Todas as contas">Todas as contas</button><div class="ms-pop" id="fContaPop"></div></div>
+        <select id="fSort" class="sort">
+          <option value="data-desc">🗓️ Data ↓</option>
+          <option value="data-asc">🗓️ Data ↑</option>
+          <option value="valor-desc">💰 Valor ↓</option>
+          <option value="valor-asc">💰 Valor ↑</option>
+          <option value="bucket">🏷️ Bucket (A–Z)</option>
+          <option value="area">📂 Área (A–Z)</option>
+          <option value="descricao">📝 Descrição (A–Z)</option>
+        </select>
+        <button class="btn-secondary" id="fClear" style="margin-left:auto">Limpar filtros</button>
+      </div>
+    </details>
     <div class="card" style="padding:6px 16px"><div class="row-list" id="lancList"></div></div>
     <div style="text-align:center;margin-top:12px">
       <button class="p-chip" id="lancMore" style="display:none"></button>
@@ -1083,7 +1114,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 09:27</span> · <span id="recCount"></span> lançamentos · v4.7.6 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 09:36</span> · <span id="recCount"></span> lançamentos · v4.7.7 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1652,10 +1683,12 @@ function openDrill(title, records){
   document.getElementById('modalList').innerHTML = sorted.map(r => {
     const sign = r.tipo==='Receita'?'pos':'neg';
     const sv = (r.tipo==='Receita'?'+':'-') + fmt(r.valor).replace('-','');
-    const c = hashColor(r.area||r.categoria||'');
+    const c = hashColor(r.bucket||r.area||r.categoria||'');
+    const tagBucket = r.bucket ? `<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:${c}22;color:${c};font-weight:600;margin-right:4px">${escapeHtml(r.bucket)}</span>` : '';
+    const subTxt = r.sub ? ` › ${escapeHtml(r.sub)}` : '';
     return `<div class="row"><span class="swatch" style="background:${c}"></span><div class="left">
-      <div class="name">${escapeHtml(r.descricao||r.categoria||'(sem descrição)')}</div>
-      <div class="meta">${formatDate(r.data)} · ${escapeHtml(r.area||'')} · ${escapeHtml(r.categoria||'')}</div>
+      <div class="name">${tagBucket}${escapeHtml(r.descricao||r.categoria||'(sem descrição)')}</div>
+      <div class="meta">${formatDate(r.data)} · ${escapeHtml(r.area||'')}${subTxt} · ${escapeHtml(r.categoria||'')}</div>
     </div><div class="amt ${sign}">${sv}</div></div>`;
   }).join('') || '<div class="empty">Sem lançamentos.</div>';
   modalBg.classList.add('open');
@@ -2333,6 +2366,29 @@ function renderAreas(){
     el.addEventListener('click', () => { const a=el.dataset.area; openDrill(a+' · '+periodLabel(), recs.filter(r=>(r.area||'(sem área)')===a)); }));
 
   // ===== Bucket (nova taxonomia gerencial) =====
+  const br = sumByBucket(recs, 'Receita');
+  const brColors = br.map(([b])=>hashColor(b));
+  const totalBR = br.reduce((a,[_,v])=>a+v,0);
+  mkChart('chartAllBucketsR', {
+    type:'doughnut',
+    data:{labels:br.map(([b])=>b),datasets:[{data:br.map(([_,v])=>v),backgroundColor:brColors,borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
+      onClick:(_e,els)=>{ if(!els.length) return; const b=br[els[0].index][0]; openDrill(b+' · '+periodLabel(), recs.filter(r=>(r.bucket||'(sem bucket)')===b && r.tipo==='Receita')); },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+fmt(c.parsed)}},centerLabel:{label:'Receita',text:fmtCompact(totalBR)}}},
+    plugins:[centerLabel]
+  });
+  document.getElementById('listAllBucketsR').innerHTML = br.map(([b,v])=>{
+    const c = hashColor(b); const pct = totalBR?(v/totalBR*100):0;
+    const n = recs.filter(r=>(r.bucket||'(sem bucket)')===b && r.tipo==='Receita').length;
+    return `<div class="cat-row" data-bucket="${escapeHtml(b)}">
+      <div class="top"><span class="swatch" style="background:${c}"></span><span class="name">${escapeHtml(b)}</span><span class="amt pos">${fmtCompact(v)}</span></div>
+      <div class="bar"><div class="fill" style="width:${pct}%;background:${c}"></div></div>
+      <div class="footnote"><span>${n} itens</span><span>${pct.toFixed(1).replace('.',',')}%</span></div>
+    </div>`;
+  }).join('') || '<div class="empty">Sem receita no período.</div>';
+  document.querySelectorAll('#listAllBucketsR .cat-row').forEach(el =>
+    el.addEventListener('click', () => { const b=el.dataset.bucket; openDrill(b+' · '+periodLabel(), recs.filter(r=>(r.bucket||'(sem bucket)')===b && r.tipo==='Receita')); }));
+
   const bd = sumByBucket(recs, 'Despesa');
   const bdColors = bd.map(([b])=>hashColor(b));
   const totalBD = bd.reduce((a,[_,v])=>a+v,0);
@@ -2355,11 +2411,58 @@ function renderAreas(){
   }).join('') || '<div class="empty">Sem despesa no período.</div>';
   document.querySelectorAll('#listAllBucketsD .cat-row').forEach(el =>
     el.addEventListener('click', () => { const b=el.dataset.bucket; openDrill(b+' · '+periodLabel(), recs.filter(r=>(r.bucket||'(sem bucket)')===b && r.tipo==='Despesa')); }));
+
+  // ===== Sub-Categoria (Top 15 despesas) =====
+  const subMap = new Map();
+  recs.forEach(r => {
+    if(r.tipo!=='Despesa') return;
+    const k = `${r.bucket||'(sem bucket)'} › ${r.sub||'(sem sub)'}`;
+    subMap.set(k, (subMap.get(k)||0) + r.valor);
+  });
+  const subSorted = [...subMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const totalSub = subSorted.reduce((a,[_,v])=>a+v,0);
+  document.getElementById('listAllSubsD').innerHTML = subSorted.map(([k,v])=>{
+    const [bk,sb] = k.split(' › ');
+    const c = hashColor(bk); const pct = totalSub?(v/totalSub*100):0;
+    const n = recs.filter(r=>(r.bucket||'(sem bucket)')===bk && (r.sub||'(sem sub)')===sb && r.tipo==='Despesa').length;
+    return `<div class="cat-row" data-bk="${escapeHtml(bk)}" data-sb="${escapeHtml(sb)}">
+      <div class="top"><span class="swatch" style="background:${c}"></span><span class="name"><span style="font-size:10px;opacity:.7">${escapeHtml(bk)}</span><br>${escapeHtml(sb)}</span><span class="amt neg">${fmtCompact(v)}</span></div>
+      <div class="bar"><div class="fill" style="width:${pct}%;background:${c}"></div></div>
+      <div class="footnote"><span>${n} itens</span><span>${pct.toFixed(1).replace('.',',')}%</span></div>
+    </div>`;
+  }).join('') || '<div class="empty">Sem despesa no período.</div>';
+  document.querySelectorAll('#listAllSubsD .cat-row').forEach(el =>
+    el.addEventListener('click', () => {
+      const bk=el.dataset.bk, sb=el.dataset.sb;
+      openDrill(`${bk} › ${sb} · ${periodLabel()}`, recs.filter(r=>(r.bucket||'(sem bucket)')===bk && (r.sub||'(sem sub)')===sb && r.tipo==='Despesa'));
+    }));
 }
 
 /* ===================== LANCAMENTOS ===================== */
 let lancShown = 60;
-const lancFilter = { tipos: new Set(), areas: new Set() };
+const lancFilter = {
+  tipos: new Set(),
+  areas: new Set(),
+  buckets: new Set(),
+  subs: new Set(),
+  cats: new Set(),
+  resps: new Set(),
+  contas: new Set(),
+};
+function activeFilterCount(){
+  const f = lancFilter;
+  let n = 0;
+  ['tipos','areas','buckets','subs','cats','resps','contas'].forEach(k => { if(f[k].size) n++; });
+  const q = (document.getElementById('fSearch')||{}).value || '';
+  if(q.trim()) n++;
+  return n;
+}
+function refreshFilterBadge(){
+  const el = document.getElementById('filterCount');
+  if(!el) return;
+  const n = activeFilterCount();
+  el.textContent = n ? `${n} filtro${n>1?'s':''} ativo${n>1?'s':''}` : '';
+}
 
 function buildMultiSelect(btnId, popId, options, labelAll, state){
   const btn = document.getElementById(btnId);
@@ -2401,9 +2504,14 @@ function buildMultiSelect(btnId, popId, options, labelAll, state){
 
 function renderLanc(){
   const recs = recordsInPeriod();
-  const areas = [...new Set(LANCAMENTOS.map(r=>r.area).filter(Boolean))].sort();
+  const uniq = (k) => [...new Set(LANCAMENTOS.map(r=>r[k]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   buildMultiSelect('fTipoBtn','fTipoPop', ['Receita','Despesa'], 'Todos os tipos', lancFilter.tipos);
-  buildMultiSelect('fAreaBtn','fAreaPop', areas, 'Todas as áreas', lancFilter.areas);
+  buildMultiSelect('fBucketBtn','fBucketPop', uniq('bucket'), 'Todos os buckets', lancFilter.buckets);
+  buildMultiSelect('fSubBtn','fSubPop', uniq('sub'), 'Todas as sub-categorias', lancFilter.subs);
+  buildMultiSelect('fAreaBtn','fAreaPop', uniq('area'), 'Todas as áreas', lancFilter.areas);
+  buildMultiSelect('fCatBtn','fCatPop', uniq('categoria'), 'Todas as categorias', lancFilter.cats);
+  buildMultiSelect('fRespBtn','fRespPop', uniq('responsavel'), 'Todos os responsáveis', lancFilter.resps);
+  buildMultiSelect('fContaBtn','fContaPop', uniq('conta'), 'Todas as contas', lancFilter.contas);
   applyLancFilter(recs);
 }
 function getFilteredLanc(baseRecs){
@@ -2415,13 +2523,26 @@ function getFilteredLanc(baseRecs){
     'data-asc':  (x,y)=>x.data.localeCompare(y.data),
     'valor-desc':(x,y)=>(y.valor||0)-(x.valor||0),
     'valor-asc': (x,y)=>(x.valor||0)-(y.valor||0),
+    'bucket':    (x,y)=>(x.bucket||'').localeCompare(y.bucket||'','pt-BR'),
     'area':      (x,y)=>(x.area||'').localeCompare(y.area||'','pt-BR'),
     'descricao': (x,y)=>(x.descricao||x.categoria||'').localeCompare(y.descricao||y.categoria||'','pt-BR'),
   };
+  const f = lancFilter;
   return baseRecs
-    .filter(r => lancFilter.tipos.size===0 || lancFilter.tipos.has(r.tipo))
-    .filter(r => lancFilter.areas.size===0 || lancFilter.areas.has(r.area))
-    .filter(r => !q || (r.descricao||'').toLowerCase().includes(q) || (r.area||'').toLowerCase().includes(q) || (r.categoria||'').toLowerCase().includes(q))
+    .filter(r => f.tipos.size===0   || f.tipos.has(r.tipo))
+    .filter(r => f.buckets.size===0 || f.buckets.has(r.bucket))
+    .filter(r => f.subs.size===0    || f.subs.has(r.sub))
+    .filter(r => f.areas.size===0   || f.areas.has(r.area))
+    .filter(r => f.cats.size===0    || f.cats.has(r.categoria))
+    .filter(r => f.resps.size===0   || f.resps.has(r.responsavel))
+    .filter(r => f.contas.size===0  || f.contas.has(r.conta))
+    .filter(r => !q
+      || (r.descricao||'').toLowerCase().includes(q)
+      || (r.area||'').toLowerCase().includes(q)
+      || (r.categoria||'').toLowerCase().includes(q)
+      || (r.bucket||'').toLowerCase().includes(q)
+      || (r.sub||'').toLowerCase().includes(q)
+      || (r.responsavel||'').toLowerCase().includes(q))
     .sort(sorters[sortBy] || sorters['data-desc']);
 }
 function applyLancFilter(baseRecs){
@@ -2431,21 +2552,30 @@ function applyLancFilter(baseRecs){
   document.getElementById('lancList').innerHTML = show.map(r => {
     const sign = r.tipo==='Receita'?'pos':'neg';
     const sv = (r.tipo==='Receita'?'+':'-') + fmt(r.valor).replace('-','');
-    const c = hashColor(r.area||r.categoria||'');
+    const c = hashColor(r.bucket||r.area||r.categoria||'');
+    const tagBucket = r.bucket ? `<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:${c}22;color:${c};font-weight:600;margin-right:4px">${escapeHtml(r.bucket)}</span>` : '';
+    const subTxt = r.sub ? ` › ${escapeHtml(r.sub)}` : '';
     return `<div class="row"><span class="swatch" style="background:${c}"></span><div class="left">
-      <div class="name">${escapeHtml(r.descricao||r.categoria||'(sem descrição)')}</div>
-      <div class="meta">${formatDate(r.data)} · ${escapeHtml(r.area||'')} · ${escapeHtml(r.categoria||'')}</div>
+      <div class="name">${tagBucket}${escapeHtml(r.descricao||r.categoria||'(sem descrição)')}</div>
+      <div class="meta">${formatDate(r.data)} · ${escapeHtml(r.area||'')}${subTxt} · ${escapeHtml(r.categoria||'')}</div>
     </div><div class="amt ${sign}">${sv}</div></div>`;
   }).join('') || '<div class="empty">Nenhum lançamento encontrado.</div>';
   const more = document.getElementById('lancMore');
   if(filtered.length>lancShown){ more.style.display='inline-block'; more.textContent=`Carregar mais (${filtered.length-lancShown} restantes)`; }
   else more.style.display='none';
   document.getElementById('lancCount').textContent = `${filtered.length} de ${baseRecs.length}`;
+  refreshFilterBadge();
 }
 document.getElementById('fSearch').addEventListener('input', ()=>{lancShown=60;applyLancFilter();});
 document.getElementById('fSort').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
 document.addEventListener('click', () => document.querySelectorAll('.ms-pop.open').forEach(p=>p.classList.remove('open')));
 document.getElementById('lancMore').addEventListener('click', ()=>{lancShown+=120;applyLancFilter();});
+document.getElementById('fClear').addEventListener('click', () => {
+  ['tipos','areas','buckets','subs','cats','resps','contas'].forEach(k => lancFilter[k].clear());
+  document.getElementById('fSearch').value = '';
+  lancShown = 60;
+  renderLanc();
+});
 
 /* ===================== CSV EXPORT ===================== */
 function exportCsvLanc(){
@@ -3019,6 +3149,23 @@ document.getElementById('eRepetir').addEventListener('change', e=>{
   document.getElementById('eRepetirRow').style.display = e.target.checked ? 'block' : 'none';
 });
 triggerRecurring();
+
+/* ===================== RESUMO CLICKABLE DRILLS ===================== */
+(function wireResumoDrills(){
+  const lbl = () => periodLabel();
+  const allRec = () => recordsInPeriod();
+  const drillAll = (titlePrefix) => openDrill(`${titlePrefix} · ${lbl()}`, allRec());
+  const drillRec = (titlePrefix) => openDrill(`${titlePrefix} · ${lbl()}`, allRec().filter(r=>r.tipo==='Receita'));
+  const drillDes = (titlePrefix) => openDrill(`${titlePrefix} · ${lbl()}`, allRec().filter(r=>r.tipo==='Despesa'));
+  const wire = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
+  wire('heroVal',       () => drillAll('Lucro líquido (todos os lançamentos)'));
+  wire('hbRecBox',      () => drillRec('Receitas'));
+  wire('hbDesBox',      () => drillDes('Despesas'));
+  wire('kpiReceitaBox', () => drillRec('Receitas'));
+  wire('kpiDespesaBox', () => drillDes('Despesas'));
+  wire('kpiMargemBox',  () => drillAll('Margem (receitas e despesas)'));
+  wire('kpiItensBox',   () => drillAll('Todos os lançamentos'));
+})();
 
 /* ===================== SERVICE WORKER (PWA) ===================== */
 if('serviceWorker' in navigator && location.protocol==='https:'){
