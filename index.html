@@ -669,6 +669,19 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 
 /* ============ SORT SELECT ============ */
 .filters select.sort{flex:0 0 auto}
+
+/* ============ MULTI-SELECT ============ */
+.ms-wrap{position:relative;flex:1;min-width:140px}
+.ms-btn{width:100%;padding:9px 30px 9px 12px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:9px;font-size:13px;color:var(--cp-text);text-align:left;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
+.ms-btn::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--cp-text-soft);pointer-events:none}
+.ms-btn.has-sel{border-color:var(--cp-accent);color:var(--cp-accent);font-weight:600}
+.ms-pop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:10px;box-shadow:var(--cp-shadow-strong);z-index:50;max-height:260px;overflow-y:auto;display:none;padding:4px}
+.ms-pop.open{display:block}
+.ms-pop label{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--cp-text)}
+.ms-pop label:hover{background:var(--cp-surface-soft)}
+.ms-pop input[type=checkbox]{width:auto;margin:0;accent-color:var(--cp-accent)}
+.ms-pop .ms-head{display:flex;justify-content:space-between;padding:6px 10px 4px;border-bottom:1px solid var(--cp-border);margin-bottom:4px}
+.ms-pop .ms-head button{background:none;border:none;color:var(--cp-accent);font-size:11.5px;cursor:pointer;padding:2px 4px;font-weight:600}
 </style>
 </head>
 <body class="locked">
@@ -956,13 +969,14 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <div class="subhead" style="margin:0">Lançamentos <span class="info" id="lancCount"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-secondary" id="reconcileBtn">🔍 Reconciliar</button>
+        <button class="btn-secondary" id="exportXlsx">📊 Excel</button>
         <button class="btn-secondary" id="exportCsv">📥 CSV</button>
       </div>
     </div>
     <div class="filters">
       <input id="fSearch" placeholder="🔍 Buscar...">
-      <select id="fTipo"><option value="">Todos</option><option>Receita</option><option>Despesa</option></select>
-      <select id="fArea"><option value="">Todas as áreas</option></select>
+      <div class="ms-wrap"><button type="button" class="ms-btn" id="fTipoBtn" data-default="Todos os tipos">Todos os tipos</button><div class="ms-pop" id="fTipoPop"></div></div>
+      <div class="ms-wrap"><button type="button" class="ms-btn" id="fAreaBtn" data-default="Todas as áreas">Todas as áreas</button><div class="ms-pop" id="fAreaPop"></div></div>
       <select id="fSort" class="sort">
         <option value="data-desc">🗓️ Data ↓</option>
         <option value="data-asc">🗓️ Data ↑</option>
@@ -1052,7 +1066,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:17</span> · <span id="recCount"></span> lançamentos · v4.5 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:19</span> · <span id="recCount"></span> lançamentos · v4.6 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -2290,18 +2304,51 @@ function renderAreas(){
 
 /* ===================== LANCAMENTOS ===================== */
 let lancShown = 60;
+const lancFilter = { tipos: new Set(), areas: new Set() };
+
+function buildMultiSelect(btnId, popId, options, labelAll, state){
+  const btn = document.getElementById(btnId);
+  const pop = document.getElementById(popId);
+  pop.innerHTML = `<div class="ms-head"><button type="button" data-act="all">Marcar todos</button><button type="button" data-act="none">Limpar</button></div>` +
+    options.map(o=>`<label><input type="checkbox" value="${escapeHtml(o)}" ${state.has(o)?'checked':''}> ${escapeHtml(o)}</label>`).join('');
+  function refreshLabel(){
+    if(state.size===0){ btn.textContent = labelAll; btn.classList.remove('has-sel'); }
+    else if(state.size===1){ btn.textContent = [...state][0]; btn.classList.add('has-sel'); }
+    else { btn.textContent = `${state.size} selecionados`; btn.classList.add('has-sel'); }
+  }
+  refreshLabel();
+  btn.onclick = e => {
+    e.stopPropagation();
+    document.querySelectorAll('.ms-pop.open').forEach(p=>{ if(p!==pop) p.classList.remove('open'); });
+    pop.classList.toggle('open');
+  };
+  pop.onclick = e => e.stopPropagation();
+  pop.querySelectorAll('input[type=checkbox]').forEach(cb => cb.onchange = () => {
+    if(cb.checked) state.add(cb.value); else state.delete(cb.value);
+    refreshLabel(); lancShown=60; applyLancFilter();
+  });
+  pop.querySelector('[data-act=all]').onclick = () => {
+    state.clear(); options.forEach(o=>state.add(o));
+    pop.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=true);
+    refreshLabel(); lancShown=60; applyLancFilter();
+  };
+  pop.querySelector('[data-act=none]').onclick = () => {
+    state.clear();
+    pop.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    refreshLabel(); lancShown=60; applyLancFilter();
+  };
+}
+
 function renderLanc(){
   const recs = recordsInPeriod();
   const areas = [...new Set(LANCAMENTOS.map(r=>r.area).filter(Boolean))].sort();
-  const sel = document.getElementById('fArea');
-  if(sel.options.length<=1) sel.innerHTML = '<option value="">Todas as áreas</option>' + areas.map(a=>`<option>${escapeHtml(a)}</option>`).join('');
+  buildMultiSelect('fTipoBtn','fTipoPop', ['Receita','Despesa'], 'Todos os tipos', lancFilter.tipos);
+  buildMultiSelect('fAreaBtn','fAreaPop', areas, 'Todas as áreas', lancFilter.areas);
   applyLancFilter(recs);
 }
-function applyLancFilter(baseRecs){
+function getFilteredLanc(baseRecs){
   baseRecs = baseRecs || recordsInPeriod();
   const q = (document.getElementById('fSearch').value||'').toLowerCase();
-  const t = document.getElementById('fTipo').value;
-  const a = document.getElementById('fArea').value;
   const sortBy = (document.getElementById('fSort')||{}).value || 'data-desc';
   const sorters = {
     'data-desc': (x,y)=>y.data.localeCompare(x.data),
@@ -2311,11 +2358,15 @@ function applyLancFilter(baseRecs){
     'area':      (x,y)=>(x.area||'').localeCompare(y.area||'','pt-BR'),
     'descricao': (x,y)=>(x.descricao||x.categoria||'').localeCompare(y.descricao||y.categoria||'','pt-BR'),
   };
-  const filtered = baseRecs
-    .filter(r => !t || r.tipo===t)
-    .filter(r => !a || r.area===a)
+  return baseRecs
+    .filter(r => lancFilter.tipos.size===0 || lancFilter.tipos.has(r.tipo))
+    .filter(r => lancFilter.areas.size===0 || lancFilter.areas.has(r.area))
     .filter(r => !q || (r.descricao||'').toLowerCase().includes(q) || (r.area||'').toLowerCase().includes(q) || (r.categoria||'').toLowerCase().includes(q))
     .sort(sorters[sortBy] || sorters['data-desc']);
+}
+function applyLancFilter(baseRecs){
+  baseRecs = baseRecs || recordsInPeriod();
+  const filtered = getFilteredLanc(baseRecs);
   const show = filtered.slice(0,lancShown);
   document.getElementById('lancList').innerHTML = show.map(r => {
     const sign = r.tipo==='Receita'?'pos':'neg';
@@ -2332,22 +2383,13 @@ function applyLancFilter(baseRecs){
   document.getElementById('lancCount').textContent = `${filtered.length} de ${baseRecs.length}`;
 }
 document.getElementById('fSearch').addEventListener('input', ()=>{lancShown=60;applyLancFilter();});
-document.getElementById('fTipo').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
-document.getElementById('fArea').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
 document.getElementById('fSort').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
+document.addEventListener('click', () => document.querySelectorAll('.ms-pop.open').forEach(p=>p.classList.remove('open')));
 document.getElementById('lancMore').addEventListener('click', ()=>{lancShown+=120;applyLancFilter();});
 
 /* ===================== CSV EXPORT ===================== */
 function exportCsvLanc(){
-  const recs = recordsInPeriod();
-  const q = (document.getElementById('fSearch').value||'').toLowerCase();
-  const t = document.getElementById('fTipo').value;
-  const a = document.getElementById('fArea').value;
-  const filtered = recs
-    .filter(r => !t || r.tipo===t)
-    .filter(r => !a || r.area===a)
-    .filter(r => !q || (r.descricao||'').toLowerCase().includes(q) || (r.area||'').toLowerCase().includes(q) || (r.categoria||'').toLowerCase().includes(q))
-    .sort((x,y)=>y.data.localeCompare(x.data));
+  const filtered = getFilteredLanc();
   if(!filtered.length){ toast('Nada pra exportar com esses filtros'); return; }
   const esc = v => {
     const s = (v==null?'':String(v));
@@ -2369,6 +2411,54 @@ function exportCsvLanc(){
   toast(`${filtered.length} lançamentos exportados`);
 }
 document.getElementById('exportCsv').addEventListener('click', exportCsvLanc);
+
+/* ===================== EXCEL EXPORT (SheetJS) ===================== */
+let _xlsxPromise = null;
+function loadXLSX(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  if(_xlsxPromise) return _xlsxPromise;
+  _xlsxPromise = new Promise((res,rej)=>{
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload = ()=>res(window.XLSX);
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+  return _xlsxPromise;
+}
+async function exportXlsxLanc(){
+  const filtered = getFilteredLanc();
+  if(!filtered.length){ toast('Nada pra exportar com esses filtros'); return; }
+  toast('Gerando Excel...');
+  try{
+    const XLSX = await loadXLSX();
+    const head = ['Data','Tipo','Área','Categoria','Descrição','Valor','Conta','Responsável','Status','Forma','CC','F/V'];
+    const rows = filtered.map(r => [
+      r.data, r.tipo, r.area||'', r.categoria||'', r.descricao||'',
+      +r.valor||0, r.conta||'', r.responsavel||'', r.status||'', r.forma||'', r.cc||'', r.fv||''
+    ]);
+    const totR = filtered.filter(r=>r.tipo==='Receita').reduce((s,r)=>s+(+r.valor||0),0);
+    const totD = filtered.filter(r=>r.tipo==='Despesa').reduce((s,r)=>s+(+r.valor||0),0);
+    const aoa = [head, ...rows, [], ['','','','','Total Receita', totR], ['','','','','Total Despesa', totD], ['','','','','Lucro', totR-totD]];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [{wch:11},{wch:9},{wch:22},{wch:22},{wch:36},{wch:12},{wch:14},{wch:14},{wch:11},{wch:12},{wch:10},{wch:6}];
+    const lastRow = aoa.length;
+    for(let i=2; i<=rows.length+1; i++){
+      const c = XLSX.utils.encode_cell({r:i-1, c:5});
+      if(ws[c]) ws[c].z = 'R$ #,##0.00';
+    }
+    for(let i=lastRow-2; i<=lastRow; i++){
+      const c = XLSX.utils.encode_cell({r:i-1, c:5});
+      if(ws[c]) ws[c].z = 'R$ #,##0.00';
+    }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Lançamentos');
+    const stamp = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `TB_lancamentos_${stamp}.xlsx`);
+    toast(`${filtered.length} lançamentos exportados`);
+  }catch(e){ console.error(e); toast('Erro ao gerar Excel'); }
+}
+document.getElementById('exportXlsx').addEventListener('click', exportXlsxLanc);
 
 /* ===================== COMPARISON NOIVAS vs CURSOS ===================== */
 function renderComparison(recs){
