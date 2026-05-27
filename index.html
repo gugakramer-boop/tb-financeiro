@@ -602,6 +602,73 @@ body.accountant-mode #heatmapCard,
 body.accountant-mode .insights{display:none !important}
 body.accountant-mode .acc-badge{display:inline-flex !important}
 .acc-badge{display:none;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:99px;background:var(--cp-warning);color:#000;font-weight:600;margin-left:8px}
+
+/* ============ HEALTH SCORE ============ */
+.health-card{padding:14px 16px;border-radius:14px;background:var(--cp-surface);border:1px solid var(--cp-border);margin-bottom:14px;box-shadow:var(--cp-shadow-soft)}
+.health-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.health-circle{position:relative;width:72px;height:72px;flex:0 0 auto}
+.health-circle svg{transform:rotate(-90deg)}
+.health-circle .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--cp-text)}
+.health-info{flex:1;min-width:0}
+.health-info .t{font-size:13px;font-weight:600;color:var(--cp-text);margin-bottom:2px}
+.health-info .s{font-size:12px;color:var(--cp-text-muted);line-height:1.4}
+.health-bars{display:flex;flex-direction:column;gap:7px}
+.health-bar{display:grid;grid-template-columns:90px 1fr 36px;gap:8px;align-items:center;font-size:11.5px}
+.health-bar .nm{color:var(--cp-text-soft)}
+.health-bar .track{height:6px;border-radius:3px;background:var(--cp-surface-soft);overflow:hidden}
+.health-bar .fill{height:100%;border-radius:3px;background:var(--cp-accent);transition:width .5s ease}
+.health-bar .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--cp-text);font-weight:600}
+
+/* ============ WHAT-IF / BUDGET / RECONCILIATION ============ */
+.simul-list{display:flex;flex-direction:column;gap:12px;margin:8px 0 14px}
+.simul-row{padding:10px 12px;background:var(--cp-surface-soft);border-radius:10px}
+.simul-row .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12.5px}
+.simul-row .head .nm{font-weight:600;color:var(--cp-text)}
+.simul-row .head .pct{font-variant-numeric:tabular-nums;color:var(--cp-text-muted)}
+.simul-row .head .pct.neg{color:var(--cp-danger)} .simul-row .head .pct.pos{color:var(--cp-success)}
+.simul-row input[type=range]{width:100%;accent-color:var(--cp-accent)}
+.simul-row .vals{display:flex;justify-content:space-between;font-size:11px;color:var(--cp-text-soft);margin-top:4px;font-variant-numeric:tabular-nums}
+.simul-summary{padding:12px 14px;border-radius:12px;background:var(--cp-accent-soft);margin-bottom:10px}
+.simul-summary .row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.simul-summary .row.tot{font-weight:700;font-size:15px;border-top:1px solid var(--cp-border);margin-top:4px;padding-top:8px}
+
+.budget-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0}
+.budget-table th,.budget-table td{padding:7px 6px;text-align:left;border-bottom:1px solid var(--cp-border)}
+.budget-table th{font-size:11px;color:var(--cp-text-soft);font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.budget-table td input{width:100%;background:transparent;border:1px solid var(--cp-border);border-radius:6px;padding:4px 6px;font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--cp-text)}
+.budget-table td.am{font-variant-numeric:tabular-nums;text-align:right}
+.budget-table td.delta.pos{color:var(--cp-success)} .budget-table td.delta.neg{color:var(--cp-danger)}
+
+.rec-drop{border:2px dashed var(--cp-border-strong);padding:16px;border-radius:12px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:10px}
+.rec-drop:hover{border-color:var(--cp-accent);background:var(--cp-accent-soft)}
+.rec-drop .ic{font-size:28px;margin-bottom:4px}
+.rec-drop .t{font-size:13px;font-weight:500;color:var(--cp-text)}
+.rec-drop .s{font-size:11px;color:var(--cp-text-soft);margin-top:2px}
+.rec-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.rec-stat{padding:10px;background:var(--cp-surface-soft);border-radius:10px;text-align:center}
+.rec-stat .n{font-size:18px;font-weight:700;color:var(--cp-text);font-variant-numeric:tabular-nums}
+.rec-stat .l{font-size:10.5px;color:var(--cp-text-soft);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.rec-stat.ok .n{color:var(--cp-success)}
+.rec-stat.warn .n{color:var(--cp-warning)}
+.rec-stat.miss .n{color:var(--cp-danger)}
+.rec-list{max-height:280px;overflow-y:auto;font-size:12px}
+.rec-tx{display:grid;grid-template-columns:14px 70px 1fr 80px;gap:8px;padding:6px 4px;border-bottom:1px solid var(--cp-border);align-items:center}
+.rec-tx .badge{font-size:13px;text-align:center}
+.rec-tx .dt{color:var(--cp-text-soft);font-variant-numeric:tabular-nums}
+.rec-tx .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-tx .am{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.rec-tabs{display:flex;gap:4px;margin-bottom:8px;background:var(--cp-surface-soft);padding:3px;border-radius:9px}
+.rec-tabs button{flex:1;padding:6px;border:none;background:transparent;border-radius:7px;font-size:11.5px;color:var(--cp-text-muted);cursor:pointer;font-weight:500}
+.rec-tabs button.active{background:var(--cp-surface);color:var(--cp-text);box-shadow:var(--cp-shadow-soft)}
+
+/* ============ PHOTO PREVIEW ============ */
+.photo-row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.photo-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;border:1px solid var(--cp-border)}
+.photo-clear{background:transparent;border:none;color:var(--cp-danger);font-size:18px;cursor:pointer}
+.draft-row .thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;border:1px solid var(--cp-border);flex:0 0 auto}
+
+/* ============ SORT SELECT ============ */
+.filters select.sort{flex:0 0 auto}
 </style>
 </head>
 <body class="locked">
@@ -643,7 +710,8 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
     <span class="lbl" id="periodLbl">—</span>
     <span class="ic">▾</span>
   </button>
-  <button class="icon-btn" id="printBtn" aria-label="Imprimir / PDF" title="Imprimir ou salvar PDF">🖨️</button>
+  <button class="icon-btn" id="printBtn" aria-label="Imprimir / PDF" title="Imprimir">🖨️</button>
+  <button class="icon-btn" id="pdfBtn" aria-label="Exportar PDF" title="Exportar PDF formatado">📄</button>
   <button class="icon-btn" id="themeBtn" aria-label="Tema">🌓</button>
 </header>
 
@@ -687,6 +755,23 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
         <div class="val" id="caixaPrev">—</div>
         <div class="sub" id="caixaPrevSub"></div>
       </div>
+    </div>
+
+    <div class="health-card" id="healthCard">
+      <div class="health-top">
+        <div class="health-circle">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle cx="36" cy="36" r="30" fill="none" stroke="var(--cp-surface-soft)" stroke-width="7"/>
+            <circle cx="36" cy="36" r="30" fill="none" stroke="var(--cp-accent)" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 188.5" id="healthArc"/>
+          </svg>
+          <div class="num" id="healthNum">—</div>
+        </div>
+        <div class="health-info">
+          <div class="t">Saúde do negócio <span id="healthLabel">—</span></div>
+          <div class="s" id="healthMsg">Calculando…</div>
+        </div>
+      </div>
+      <div class="health-bars" id="healthBars"></div>
     </div>
 
     <div class="ai-card" id="aiCard">
@@ -735,10 +820,17 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <div class="feature-card" id="metaCard">
         <div class="fc-head">
           <div class="fc-title">🎯 Metas</div>
-          <button class="fc-action" id="editGoalsBtn">Editar</button>
+          <div style="display:flex;gap:6px">
+            <button class="fc-action" id="budgetBtn">Orçamento</button>
+            <button class="fc-action" id="editGoalsBtn">Editar</button>
+          </div>
         </div>
         <div id="metaContent"></div>
       </div>
+    </div>
+
+    <div style="text-align:center;margin:6px 0 14px">
+      <button class="btn-secondary" id="whatIfBtn">🎛️ Simular cenários (what-if)</button>
     </div>
 
     <div class="subhead"><span id="resumoChartTitle">Receita vs Despesa</span><span class="info" id="resumoChartSub"></span></div>
@@ -862,12 +954,23 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   <section class="panel" id="panel-lancamentos">
     <div class="toolbar-row">
       <div class="subhead" style="margin:0">Lançamentos <span class="info" id="lancCount"></span></div>
-      <button class="btn-secondary" id="exportCsv">📥 Exportar CSV</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-secondary" id="reconcileBtn">🔍 Reconciliar</button>
+        <button class="btn-secondary" id="exportCsv">📥 CSV</button>
+      </div>
     </div>
     <div class="filters">
       <input id="fSearch" placeholder="🔍 Buscar...">
       <select id="fTipo"><option value="">Todos</option><option>Receita</option><option>Despesa</option></select>
       <select id="fArea"><option value="">Todas as áreas</option></select>
+      <select id="fSort" class="sort">
+        <option value="data-desc">🗓️ Data ↓</option>
+        <option value="data-asc">🗓️ Data ↑</option>
+        <option value="valor-desc">💰 Valor ↓</option>
+        <option value="valor-asc">💰 Valor ↑</option>
+        <option value="area">📂 Área (A–Z)</option>
+        <option value="descricao">📝 Descrição (A–Z)</option>
+      </select>
     </div>
     <div class="card" style="padding:6px 16px"><div class="row-list" id="lancList"></div></div>
     <div style="text-align:center;margin-top:12px">
@@ -949,7 +1052,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:02</span> · <span id="recCount"></span> lançamentos · v4.4 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:17</span> · <span id="recCount"></span> lançamentos · v4.5 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1004,6 +1107,21 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
           <label>Responsável</label>
           <input type="text" id="eResp" placeholder="Thais, Gustavo...">
         </div>
+        <div class="form-row full">
+          <label>📷 Comprovante (opcional)</label>
+          <input type="file" id="ePhoto" accept="image/*" capture="environment">
+          <div class="photo-row" id="ePhotoPreview"></div>
+        </div>
+        <div class="form-row full">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="eRepetir" style="width:auto;margin:0">
+            🔄 Repetir todo mês
+          </label>
+          <div id="eRepetirRow" style="display:none;margin-top:6px">
+            <input type="number" id="eRepetirDia" placeholder="Dia do mês (1–28)" min="1" max="28" step="1">
+            <div class="hint">Vai gerar rascunho automaticamente todo mês nesse dia.</div>
+          </div>
+        </div>
       </div>
       <button class="btn-primary" id="entrySave" style="margin-top:14px">Salvar rascunho</button>
       <button class="btn-ghost" id="entryOpenDrafts">📄 Ver rascunhos</button>
@@ -1024,6 +1142,69 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <div class="drafts-list" id="draftsList"></div>
       <button class="btn-primary" id="draftsExport">📥 Exportar todos (CSV)</button>
       <button class="btn-ghost" id="draftsClear">Apagar todos os rascunhos</button>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT-IF MODAL -->
+<div class="modal-bg" id="whatIfBg">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3>🎛️ Simulador what-if</h3>
+      <button class="modal-close" id="whatIfClose" aria-label="Fechar">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:10px">Arraste os controles pra ver o impacto. Nada é salvo — é só simulação.</div>
+      <div class="simul-summary" id="simulSummary"></div>
+      <div class="simul-list" id="simulList"></div>
+      <button class="btn-ghost" id="simulReset">Resetar tudo</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET MODAL -->
+<div class="modal-bg" id="budgetBg">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3>📊 Orçamento por área</h3>
+      <button class="modal-close" id="budgetClose" aria-label="Fechar">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="hint" style="margin-bottom:10px">Defina meta mensal de receita/despesa por área. Tabela compara com média atual do período.</div>
+      <div style="overflow-x:auto"><table class="budget-table" id="budgetTable"></table></div>
+      <button class="btn-primary" id="budgetSave">Salvar orçamento</button>
+      <button class="btn-ghost" id="budgetClear">Apagar tudo</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECONCILIATION MODAL -->
+<div class="modal-bg" id="recBg">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3>🔍 Reconciliar com extrato</h3>
+      <button class="modal-close" id="recClose" aria-label="Fechar">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="rec-drop" id="recDrop">
+        <div class="ic">📁</div>
+        <div class="t">Toque pra escolher um arquivo</div>
+        <div class="s">Aceita OFX (banco) ou CSV (data;valor;descricao)</div>
+        <input type="file" id="recFile" accept=".ofx,.csv,.txt" style="display:none">
+      </label>
+      <div id="recResult" style="display:none">
+        <div class="rec-stats" id="recStats"></div>
+        <div class="rec-tabs">
+          <button class="active" data-rt="all">Tudo</button>
+          <button data-rt="ok">✅ Confere</button>
+          <button data-rt="warn">⚠️ Faltando</button>
+          <button data-rt="miss">❓ Só no app</button>
+        </div>
+        <div class="rec-list" id="recList"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1557,6 +1738,9 @@ function renderResumo(){
 
   // Caixa atual + previsto
   renderCaixa();
+
+  // Saúde do negócio
+  renderHealthScore(recs, prev);
 
   // AI Insights
   renderAIInsights(recs, prev);
@@ -2118,11 +2302,20 @@ function applyLancFilter(baseRecs){
   const q = (document.getElementById('fSearch').value||'').toLowerCase();
   const t = document.getElementById('fTipo').value;
   const a = document.getElementById('fArea').value;
+  const sortBy = (document.getElementById('fSort')||{}).value || 'data-desc';
+  const sorters = {
+    'data-desc': (x,y)=>y.data.localeCompare(x.data),
+    'data-asc':  (x,y)=>x.data.localeCompare(y.data),
+    'valor-desc':(x,y)=>(y.valor||0)-(x.valor||0),
+    'valor-asc': (x,y)=>(x.valor||0)-(y.valor||0),
+    'area':      (x,y)=>(x.area||'').localeCompare(y.area||'','pt-BR'),
+    'descricao': (x,y)=>(x.descricao||x.categoria||'').localeCompare(y.descricao||y.categoria||'','pt-BR'),
+  };
   const filtered = baseRecs
     .filter(r => !t || r.tipo===t)
     .filter(r => !a || r.area===a)
     .filter(r => !q || (r.descricao||'').toLowerCase().includes(q) || (r.area||'').toLowerCase().includes(q) || (r.categoria||'').toLowerCase().includes(q))
-    .sort((x,y)=>y.data.localeCompare(x.data));
+    .sort(sorters[sortBy] || sorters['data-desc']);
   const show = filtered.slice(0,lancShown);
   document.getElementById('lancList').innerHTML = show.map(r => {
     const sign = r.tipo==='Receita'?'pos':'neg';
@@ -2141,6 +2334,7 @@ function applyLancFilter(baseRecs){
 document.getElementById('fSearch').addEventListener('input', ()=>{lancShown=60;applyLancFilter();});
 document.getElementById('fTipo').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
 document.getElementById('fArea').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
+document.getElementById('fSort').addEventListener('change', ()=>{lancShown=60;applyLancFilter();});
 document.getElementById('lancMore').addEventListener('click', ()=>{lancShown+=120;applyLancFilter();});
 
 /* ===================== CSV EXPORT ===================== */
@@ -2519,10 +2713,12 @@ function renderDraftsList(){
   el.innerHTML = drafts.map((d,i)=>{
     const sign = d.tipo==='Receita'?'pos':'neg';
     const sv = (d.tipo==='Receita'?'+':'-') + 'R$ ' + (d.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const thumb = d.foto ? `<img class="thumb" src="${d.foto}" alt="">` : '';
     return `<div class="draft-row">
+      ${thumb}
       <div class="info">
         <div class="nm">${escapeHtml(d.descricao||d.categoria||'(sem descrição)')}</div>
-        <div class="meta">${formatDate(d.data)} · ${escapeHtml(d.area||'')} ${d.categoria?'· '+escapeHtml(d.categoria):''}</div>
+        <div class="meta">${formatDate(d.data)} · ${escapeHtml(d.area||'')} ${d.categoria?'· '+escapeHtml(d.categoria):''}${d.recorrente?' · 🔄':''}</div>
       </div>
       <span class="am ${sign}">${sv}</span>
       <button class="del" data-i="${i}" title="Apagar">×</button>
@@ -2568,6 +2764,12 @@ function openEntry(){
   document.getElementById('eDescricao').value = '';
   document.getElementById('eConta').value = localStorage.getItem('tb_lastConta')||'';
   document.getElementById('eResp').value = localStorage.getItem('tb_lastResp')||'';
+  document.getElementById('ePhoto').value = '';
+  document.getElementById('ePhotoPreview').innerHTML = '';
+  pendingPhoto = null;
+  document.getElementById('eRepetir').checked = false;
+  document.getElementById('eRepetirRow').style.display = 'none';
+  document.getElementById('eRepetirDia').value = '';
   // tipo default
   document.querySelectorAll('#entryTipo button').forEach(b=>b.classList.remove('active','despesa'));
   const recBtn = document.querySelector('#entryTipo button[data-t="Receita"]');
@@ -2606,6 +2808,21 @@ document.getElementById('entrySave').addEventListener('click', () => {
   };
   if(draft.conta) localStorage.setItem('tb_lastConta', draft.conta);
   if(draft.responsavel) localStorage.setItem('tb_lastResp', draft.responsavel);
+  if(pendingPhoto) draft.foto = pendingPhoto;
+  if(document.getElementById('eRepetir').checked){
+    const dia = parseInt(document.getElementById('eRepetirDia').value,10);
+    if(dia>=1 && dia<=28){
+      draft.recorrente = true;
+      const recs = getRecurring();
+      recs.push({
+        tipo: draft.tipo, area: draft.area, categoria: draft.categoria,
+        descricao: draft.descricao, valor: draft.valor, conta: draft.conta,
+        responsavel: draft.responsavel, status: draft.status,
+        dia, ultimoMes: draft.data.slice(0,7)
+      });
+      setRecurring(recs);
+    }
+  }
   const ds = getDrafts(); ds.push(draft); setDrafts(ds);
   entryBg.classList.remove('open');
   document.body.classList.remove('modal-open');
@@ -2629,11 +2846,404 @@ document.getElementById('draftsClear').addEventListener('click', () => {
 });
 updateFabBadge();
 
+/* ===================== WIRING v4.5 ===================== */
+document.getElementById('whatIfBtn').addEventListener('click', openWhatIf);
+document.getElementById('whatIfClose').addEventListener('click', ()=>{ document.getElementById('whatIfBg').classList.remove('open'); document.body.classList.remove('modal-open'); });
+document.getElementById('whatIfBg').addEventListener('click', e=>{ if(e.target.id==='whatIfBg'){ document.getElementById('whatIfBg').classList.remove('open'); document.body.classList.remove('modal-open'); }});
+document.getElementById('simulReset').addEventListener('click', openWhatIf);
+document.getElementById('budgetBtn').addEventListener('click', openBudget);
+document.getElementById('budgetClose').addEventListener('click', ()=>{ document.getElementById('budgetBg').classList.remove('open'); document.body.classList.remove('modal-open'); });
+document.getElementById('budgetBg').addEventListener('click', e=>{ if(e.target.id==='budgetBg'){ document.getElementById('budgetBg').classList.remove('open'); document.body.classList.remove('modal-open'); }});
+document.getElementById('budgetSave').addEventListener('click', saveBudget);
+document.getElementById('budgetClear').addEventListener('click', ()=>{ if(confirm('Apagar todo o orçamento?')){ setBudget({}); document.getElementById('budgetBg').classList.remove('open'); document.body.classList.remove('modal-open'); toast('Orçamento apagado'); refreshAll(); }});
+document.getElementById('reconcileBtn').addEventListener('click', ()=>{
+  document.getElementById('recDrop').style.display='block';
+  document.getElementById('recResult').style.display='none';
+  reconResult=null;
+  document.getElementById('recBg').classList.add('open'); document.body.classList.add('modal-open');
+});
+document.getElementById('recClose').addEventListener('click', ()=>{ document.getElementById('recBg').classList.remove('open'); document.body.classList.remove('modal-open'); });
+document.getElementById('recBg').addEventListener('click', e=>{ if(e.target.id==='recBg'){ document.getElementById('recBg').classList.remove('open'); document.body.classList.remove('modal-open'); }});
+document.getElementById('recFile').addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => doReconciliation(ev.target.result, f.name);
+  reader.readAsText(f);
+});
+document.querySelectorAll('.rec-tabs button').forEach(b=>b.addEventListener('click', ()=>{
+  document.querySelectorAll('.rec-tabs button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); renderRecList(b.dataset.rt);
+}));
+document.getElementById('pdfBtn').addEventListener('click', exportPDF);
+document.getElementById('ePhoto').addEventListener('change', async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    pendingPhoto = await resizeImage(f, 800);
+    document.getElementById('ePhotoPreview').innerHTML = `<img class="photo-thumb" src="${pendingPhoto}" alt=""><button class="photo-clear" type="button" title="Remover">×</button>`;
+    document.querySelector('#ePhotoPreview .photo-clear').addEventListener('click', ()=>{
+      pendingPhoto = null; document.getElementById('ePhotoPreview').innerHTML=''; document.getElementById('ePhoto').value='';
+    });
+  }catch(err){ toast('Erro ao processar foto'); }
+});
+document.getElementById('eRepetir').addEventListener('change', e=>{
+  document.getElementById('eRepetirRow').style.display = e.target.checked ? 'block' : 'none';
+});
+triggerRecurring();
+
 /* ===================== SERVICE WORKER (PWA) ===================== */
 if('serviceWorker' in navigator && location.protocol==='https:'){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   });
+}
+
+/* ===================== HEALTH SCORE ===================== */
+function renderHealthScore(recs, prev){
+  const R = sumRec(recs), D = sumDes(recs);
+  const margem = R>0 ? (R-D)/R : 0;
+  const scoreMargem = Math.max(0, Math.min(30, margem*100));
+  const Rprev = sumRec(prev||[]);
+  let scoreYoy = 12.5;
+  if(Rprev>0){
+    const g = (R-Rprev)/Rprev;
+    if(g>=0.15) scoreYoy = 25;
+    else if(g<=-0.10) scoreYoy = 0;
+    else scoreYoy = 12.5 + (g/0.25)*12.5;
+  }
+  const recR = recs.filter(r=>r.tipo==='Receita');
+  const byA = {};
+  for(const r of recR){ const a=r.area||'(sem)'; byA[a]=(byA[a]||0)+(+r.valor||0); }
+  const totA = Object.values(byA).reduce((a,b)=>a+b,0);
+  let hhi = 0;
+  if(totA>0){ for(const v of Object.values(byA)){ const s=v/totA; hhi+=s*s; } }
+  const scoreDiv = Math.max(0, 20*(1-hhi));
+  const desS = sumByMonthSeries(recs.filter(r=>r.tipo==='Despesa'));
+  const last6 = desS.slice(-6).map(p=>p.v).filter(v=>v>0);
+  let scoreReg = 0;
+  if(last6.length>=3){
+    const mean = last6.reduce((a,b)=>a+b,0)/last6.length;
+    const variance = last6.reduce((s,v)=>s+(v-mean)**2,0)/last6.length;
+    const cv = Math.sqrt(variance)/(mean||1);
+    scoreReg = Math.max(0, Math.min(15, 15*(1 - Math.min(1, cv/0.6))));
+  }
+  let caixaHoje = 0;
+  const today = todayISO();
+  for(const r of LANCAMENTOS){
+    if(r.data && r.data<=today){
+      const v = +r.valor||0;
+      caixaHoje += (r.tipo==='Receita')?v:-v;
+    }
+  }
+  const scoreCx = caixaHoje>0?10:0;
+  const total = Math.round(scoreMargem+scoreYoy+scoreDiv+scoreReg+scoreCx);
+  const arc = document.getElementById('healthArc');
+  const circ = 2*Math.PI*30;
+  arc.setAttribute('stroke-dasharray', `${(total/100)*circ} ${circ}`);
+  let color = 'var(--cp-danger)', lbl = 'Crítico';
+  if(total>=75){ color='var(--cp-success)'; lbl='Excelente'; }
+  else if(total>=55){ color='var(--cp-accent)'; lbl='Bom'; }
+  else if(total>=35){ color='var(--cp-warning)'; lbl='Atenção'; }
+  arc.setAttribute('stroke', color);
+  document.getElementById('healthNum').textContent = total;
+  document.getElementById('healthNum').style.color = color;
+  document.getElementById('healthLabel').textContent = '· ' + lbl;
+  const msgs = [];
+  if(margem<0.15) msgs.push('Margem baixa');
+  if(Rprev>0 && R<Rprev*0.95) msgs.push('Receita caindo');
+  if(hhi>0.5) msgs.push('Receita concentrada');
+  if(caixaHoje<0) msgs.push('Caixa negativo');
+  document.getElementById('healthMsg').textContent = msgs.length?msgs.join(' · '):'Indicadores saudáveis pro período.';
+  const bars = [
+    ['Margem', scoreMargem, 30],
+    ['Crescimento', scoreYoy, 25],
+    ['Diversificação', scoreDiv, 20],
+    ['Regularidade', scoreReg, 15],
+    ['Caixa', scoreCx, 10]
+  ];
+  document.getElementById('healthBars').innerHTML = bars.map(([n,v,m])=>{
+    const pct = (v/m)*100;
+    const c = pct>=70?'var(--cp-success)':(pct>=40?'var(--cp-accent)':'var(--cp-warning)');
+    return `<div class="health-bar"><div class="nm">${n}</div><div class="track"><div class="fill" style="width:${pct.toFixed(0)}%;background:${c}"></div></div><div class="v">${v.toFixed(0)}/${m}</div></div>`;
+  }).join('');
+}
+
+/* ===================== WHAT-IF SIMULATOR ===================== */
+let whatIfState = {};
+function openWhatIf(){
+  const recs = recordsInPeriod();
+  const byA = {};
+  for(const r of recs){ if(r.tipo==='Despesa'){ const a=r.area||'(sem área)'; byA[a]=(byA[a]||0)+(+r.valor||0); } }
+  const top = Object.entries(byA).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  whatIfState = {};
+  top.forEach(([a])=>whatIfState[a]=0);
+  document.getElementById('simulList').innerHTML = top.map(([a,v])=>`
+    <div class="simul-row" data-area="${escapeHtml(a)}">
+      <div class="head"><span class="nm">${escapeHtml(a)}</span><span class="pct" data-pct>0%</span></div>
+      <input type="range" min="-100" max="50" step="5" value="0" data-area="${escapeHtml(a)}">
+      <div class="vals"><span>Atual: ${fmt(v)}</span><span data-new>Novo: ${fmt(v)}</span></div>
+    </div>`).join('') || '<div class="empty">Sem despesas no período.</div>';
+  document.querySelectorAll('#simulList input[type=range]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const a = inp.dataset.area;
+      const pct = parseInt(inp.value,10);
+      whatIfState[a] = pct;
+      const row = inp.closest('.simul-row');
+      const orig = byA[a];
+      const novo = orig*(1+pct/100);
+      const lbl = row.querySelector('[data-pct]');
+      lbl.textContent = (pct>0?'+':'')+pct+'%';
+      lbl.className = 'pct ' + (pct>0?'neg':(pct<0?'pos':''));
+      row.querySelector('[data-new]').textContent = 'Novo: ' + fmt(novo);
+      renderWhatIfSummary(recs, byA);
+    });
+  });
+  renderWhatIfSummary(recs, byA);
+  document.getElementById('whatIfBg').classList.add('open');
+  document.body.classList.add('modal-open');
+}
+function renderWhatIfSummary(recs, byA){
+  const R = sumRec(recs), Dorig = sumDes(recs);
+  let deltaD = 0;
+  for(const [a,pct] of Object.entries(whatIfState)){
+    deltaD += (byA[a]||0) * (pct/100);
+  }
+  const Dnovo = Dorig + deltaD;
+  const lucro = R - Dnovo;
+  const lucroOrig = R - Dorig;
+  const dLucro = lucro - lucroOrig;
+  document.getElementById('simulSummary').innerHTML = `
+    <div class="row"><span>Receita</span><span>${fmt(R)}</span></div>
+    <div class="row"><span>Despesa simulada</span><span>${fmt(Dnovo)} <span style="color:${deltaD<0?'var(--cp-success)':(deltaD>0?'var(--cp-danger)':'var(--cp-text-soft)')}">(${deltaD>=0?'+':''}${fmt(deltaD)})</span></span></div>
+    <div class="row tot"><span>Lucro simulado</span><span style="color:${lucro>=0?'var(--cp-success)':'var(--cp-danger)'}">${fmt(lucro)} <span style="color:${dLucro>=0?'var(--cp-success)':'var(--cp-danger)'};font-weight:400">(${dLucro>=0?'+':''}${fmt(dLucro)})</span></span></div>`;
+}
+
+/* ===================== BUDGET ===================== */
+function getBudget(){ try { return JSON.parse(localStorage.getItem('tb_budget'))||{}; } catch(e){ return {}; } }
+function setBudget(b){ localStorage.setItem('tb_budget', JSON.stringify(b)); }
+function openBudget(){
+  const recs = recordsInPeriod();
+  const areas = [...new Set(LANCAMENTOS.map(r=>r.area).filter(Boolean))].sort();
+  const months = Math.max(1, monthsElapsedInPeriod());
+  const budget = getBudget();
+  const head = `<thead><tr><th>Área</th><th>Meta Rec/mês</th><th>Meta Des/mês</th><th class="am">Real Rec</th><th class="am">Real Des</th></tr></thead>`;
+  const body = areas.map(a=>{
+    const arRec = recs.filter(r=>r.area===a && r.tipo==='Receita').reduce((s,r)=>s+(+r.valor||0),0);
+    const arDes = recs.filter(r=>r.area===a && r.tipo==='Despesa').reduce((s,r)=>s+(+r.valor||0),0);
+    const mr = (budget[a]&&budget[a].receita)||'';
+    const md = (budget[a]&&budget[a].despesa)||'';
+    return `<tr data-area="${escapeHtml(a)}">
+      <td>${escapeHtml(a)}</td>
+      <td><input type="number" step="0.01" class="br" value="${mr}" placeholder="0"></td>
+      <td><input type="number" step="0.01" class="bd" value="${md}" placeholder="0"></td>
+      <td class="am">${fmt(arRec/months)}/mês</td>
+      <td class="am">${fmt(arDes/months)}/mês</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('budgetTable').innerHTML = head + '<tbody>' + body + '</tbody>';
+  document.getElementById('budgetBg').classList.add('open');
+  document.body.classList.add('modal-open');
+}
+function saveBudget(){
+  const b = {};
+  document.querySelectorAll('#budgetTable tbody tr').forEach(tr => {
+    const a = tr.dataset.area;
+    const r = parseFloat(tr.querySelector('.br').value)||0;
+    const d = parseFloat(tr.querySelector('.bd').value)||0;
+    if(r>0 || d>0) b[a] = {receita:r, despesa:d};
+  });
+  setBudget(b);
+  document.getElementById('budgetBg').classList.remove('open');
+  document.body.classList.remove('modal-open');
+  toast('Orçamento salvo'); refreshAll();
+}
+
+/* ===================== RECONCILIAÇÃO OFX/CSV ===================== */
+let reconResult = null;
+function parseOFX(text){
+  const txs = [];
+  const re = /<STMTTRN>([\s\S]*?)<\/STMTTRN>/gi;
+  let m;
+  while((m = re.exec(text)) !== null){
+    const blk = m[1];
+    const amt = parseFloat((blk.match(/<TRNAMT>([-\d.]+)/i)||[])[1]||'0');
+    const dt  = (blk.match(/<DTPOSTED>(\d{8})/i)||[])[1] || '';
+    const memo= ((blk.match(/<MEMO>([^<\r\n]+)/i)||[])[1]||'').trim();
+    if(dt && amt){
+      txs.push({data: `${dt.slice(0,4)}-${dt.slice(4,6)}-${dt.slice(6,8)}`, valor: Math.abs(amt), tipo: amt>=0?'Receita':'Despesa', descricao: memo});
+    }
+  }
+  return txs;
+}
+function parseCSV(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length) return [];
+  const sep = (lines[0].includes(';')?';':',');
+  const txs = [];
+  for(let i=0;i<lines.length;i++){
+    const cells = lines[i].split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+    if(i===0 && /data|date/i.test(cells[0])) continue;
+    let data = cells[0];
+    const md = data.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if(md) data = `${md[3]}-${md[2]}-${md[1]}`;
+    const valor = parseFloat((cells[1]||'').replace(/\./g,'').replace(',','.'));
+    const desc = cells[2]||'';
+    if(data && !isNaN(valor)){
+      txs.push({data, valor: Math.abs(valor), tipo: valor>=0?'Receita':'Despesa', descricao: desc});
+    }
+  }
+  return txs;
+}
+function doReconciliation(text, filename){
+  const txs = /\.ofx$/i.test(filename) || /<STMTTRN>/i.test(text) ? parseOFX(text) : parseCSV(text);
+  const recs = recordsInPeriod();
+  const usedApp = new Set();
+  const ok = [], warn = [];
+  for(const tx of txs){
+    const txTime = new Date(tx.data+'T00:00').getTime();
+    let match = -1;
+    recs.forEach((r,i) => {
+      if(usedApp.has(i)) return;
+      if(r.tipo!==tx.tipo) return;
+      if(Math.abs((+r.valor||0)-tx.valor) > 1) return;
+      const rt = new Date(r.data+'T00:00').getTime();
+      if(Math.abs(rt-txTime) > 3*86400000) return;
+      match = i;
+    });
+    if(match>=0){ usedApp.add(match); ok.push({tx, rec: recs[match]}); }
+    else warn.push({tx});
+  }
+  const miss = recs.filter((r,i)=>!usedApp.has(i)).map(rec=>({rec}));
+  reconResult = {ok, warn, miss, total: txs.length};
+  document.getElementById('recDrop').style.display='none';
+  document.getElementById('recResult').style.display='block';
+  document.getElementById('recStats').innerHTML = `
+    <div class="rec-stat ok"><div class="n">${ok.length}</div><div class="l">Confere</div></div>
+    <div class="rec-stat warn"><div class="n">${warn.length}</div><div class="l">Só no banco</div></div>
+    <div class="rec-stat miss"><div class="n">${miss.length}</div><div class="l">Só no app</div></div>`;
+  renderRecList('all');
+}
+function renderRecList(filter){
+  if(!reconResult) return;
+  let items = [];
+  if(filter==='all' || filter==='ok') items.push(...reconResult.ok.map(x=>({badge:'✅', tx:x.tx, rec:x.rec})));
+  if(filter==='all' || filter==='warn') items.push(...reconResult.warn.map(x=>({badge:'⚠️', tx:x.tx})));
+  if(filter==='all' || filter==='miss') items.push(...reconResult.miss.map(x=>({badge:'❓', rec:x.rec})));
+  document.getElementById('recList').innerHTML = items.map(it=>{
+    const src = it.tx || it.rec;
+    const sign = (it.tx?it.tx.tipo:it.rec.tipo)==='Receita'?'pos':'neg';
+    const sv = (sign==='pos'?'+':'-') + fmt(src.valor||0).replace('-','');
+    return `<div class="rec-tx"><span class="badge">${it.badge}</span><span class="dt">${formatDate(src.data)}</span><span class="nm">${escapeHtml(src.descricao||src.categoria||'(sem desc)')}</span><span class="am ${sign}">${sv}</span></div>`;
+  }).join('') || '<div class="empty">Nada aqui.</div>';
+}
+
+/* ===================== RECURRING ===================== */
+function getRecurring(){ try { return JSON.parse(localStorage.getItem('tb_recurring'))||[]; } catch(e){ return []; } }
+function setRecurring(r){ localStorage.setItem('tb_recurring', JSON.stringify(r)); }
+function triggerRecurring(){
+  const recs = getRecurring();
+  if(!recs.length) return;
+  const now = new Date();
+  const ym = now.toISOString().slice(0,7);
+  const day = now.getDate();
+  let created = 0;
+  for(const r of recs){
+    if(r.ultimoMes !== ym && day >= r.dia){
+      const data = `${ym}-${String(r.dia).padStart(2,'0')}`;
+      const draft = {
+        data, tipo:r.tipo, area:r.area, categoria:r.categoria, descricao:r.descricao||'',
+        valor:r.valor, conta:r.conta, responsavel:r.responsavel, status:r.status,
+        origem:'recorrente', criadoEm: new Date().toISOString(), recorrente:true
+      };
+      const ds = getDrafts(); ds.push(draft); setDrafts(ds);
+      r.ultimoMes = ym; created++;
+    }
+  }
+  if(created>0){ setRecurring(recs); setTimeout(()=>toast(`${created} lançamento(s) recorrente(s) criado(s)`), 800); }
+}
+
+/* ===================== PHOTO ATTACHMENT ===================== */
+let pendingPhoto = null;
+function resizeImage(file, max=800){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let {width:w, height:h} = img;
+        if(w>max||h>max){ const s = max/Math.max(w,h); w*=s; h*=s; }
+        const c = document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg', 0.78));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ===================== PDF EXPORT (jsPDF) ===================== */
+let _jspdfPromise = null;
+function loadJsPDF(){
+  if(window.jspdf) return Promise.resolve(window.jspdf);
+  if(_jspdfPromise) return _jspdfPromise;
+  _jspdfPromise = new Promise((res,rej)=>{
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
+    s.onload = ()=>res(window.jspdf);
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+  return _jspdfPromise;
+}
+async function exportPDF(){
+  toast('Gerando PDF...');
+  try{
+    const {jsPDF} = await loadJsPDF();
+    const doc = new jsPDF({unit:'pt', format:'a4'});
+    const W = doc.internal.pageSize.getWidth();
+    const recs = recordsInPeriod();
+    const R = sumRec(recs), D = sumDes(recs), L = R-D;
+    // capa
+    doc.setFontSize(22); doc.setTextColor(177,31,75); doc.text('Thais Bridal — Financeiro', 40, 60);
+    doc.setFontSize(14); doc.setTextColor(60,60,60); doc.text(periodLabelLong(), 40, 90);
+    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text('Gerado em '+new Date().toLocaleString('pt-BR'), 40, 108);
+    // KPIs
+    doc.setFontSize(12); doc.setTextColor(40,40,40);
+    let y = 150;
+    doc.text(`Receita: ${fmt(R)}`, 40, y); y+=22;
+    doc.text(`Despesa: ${fmt(D)}`, 40, y); y+=22;
+    doc.text(`Lucro: ${fmt(L)} (margem ${R>0?((L/R*100).toFixed(1)+'%'):'—'})`, 40, y); y+=22;
+    doc.text(`Lançamentos: ${recs.length}`, 40, y); y+=30;
+    // Gráficos
+    for(const id of ['chartTrend','chartDonut']){
+      const c = document.getElementById(id);
+      if(c){
+        try{
+          const img = c.toDataURL('image/png');
+          if(y > 600){ doc.addPage(); y=40; }
+          doc.addImage(img, 'PNG', 40, y, W-80, 220, undefined, 'FAST');
+          y += 240;
+        }catch(e){}
+      }
+    }
+    // Top áreas
+    doc.addPage();
+    doc.setFontSize(16); doc.setTextColor(177,31,75); doc.text('Top áreas (despesa)', 40, 50);
+    doc.setFontSize(10); doc.setTextColor(40,40,40);
+    const byA = {};
+    for(const r of recs){ if(r.tipo==='Despesa'){ const a=r.area||'(sem)'; byA[a]=(byA[a]||0)+(+r.valor||0); } }
+    const top = Object.entries(byA).sort((a,b)=>b[1]-a[1]).slice(0,15);
+    let ty = 80;
+    top.forEach(([a,v],i)=>{
+      doc.text(`${i+1}. ${a}`, 40, ty);
+      doc.text(fmt(v), W-40, ty, {align:'right'});
+      ty += 20;
+    });
+    doc.save(`TB_relatorio_${periodLabel().replace(/\s+/g,'_')}.pdf`);
+    toast('PDF gerado!');
+  }catch(e){ console.error(e); toast('Erro ao gerar PDF'); }
 }
 
 /* ===================== ORCHESTRATION ===================== */
