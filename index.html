@@ -1187,10 +1187,12 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <button class="p-chip" data-preset="last6">Últimos 6 meses</button>
       <button class="p-chip" data-preset="all">Tudo</button>
     </div>
+    <h4>Meses específicos <span style="font-weight:400;font-size:11px;color:var(--cp-text-soft)">(combine qualquer mês/ano)</span></h4>
+    <div class="month-grid" id="sheetPeriods"></div>
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:14</span> · <span id="recCount"></span> lançamentos · v4.9.4 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:18</span> · <span id="recCount"></span> lançamentos · v4.9.5 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1454,11 +1456,16 @@ const state = {
   years: [_defaultYear],            // array of selected years (≥1); default = ano atual
   months: [_now.getMonth()],        // array of month indices 0..11; default = mês atual
   preset: null,                     // 'ytd' | 'last3' | 'last6' | 'all' | null
+  periods: [],                      // array of 'YYYY-MM' combos; quando ≥1, sobrepõe years/months/preset
   tab: 'resumo',
 };
 
 /* ===================== FILTERING ===================== */
 function recordsInPeriod(){
+  if(state.periods && state.periods.length){
+    const set = new Set(state.periods);
+    return LANCAMENTOS.filter(r => set.has((r.data||'').slice(0,7)));
+  }
   if(state.preset==='all') return LANCAMENTOS.slice();
   if(state.preset==='ytd'){
     const y = years[years.length-1];
@@ -1482,6 +1489,18 @@ function recordsInPeriod(){
   });
 }
 function previousPeriodRecords(){
+  if(state.periods && state.periods.length){
+    const sorted = state.periods.slice().sort();
+    const [ay, am] = sorted[0].split('-').map(Number);
+    const [by, bm] = sorted[sorted.length-1].split('-').map(Number);
+    const span = (by-ay)*12 + (bm-am) + 1;
+    const prev = new Set(sorted.map(ym => {
+      const [y, m] = ym.split('-').map(Number);
+      const d = new Date(y, m-1-span, 1);
+      return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    }));
+    return LANCAMENTOS.filter(r => prev.has((r.data||'').slice(0,7)));
+  }
   if(state.preset==='all') return [];
   if(state.preset==='last3' || state.preset==='last6'){
     const n = state.preset==='last3'?3:6;
@@ -1546,6 +1565,13 @@ function formatMonthList(ms, full){
   return sorted.length+' meses';
 }
 function periodLabel(){
+  if(state.periods && state.periods.length){
+    if(state.periods.length===1){
+      const [y,m] = state.periods[0].split('-');
+      return MONTHS_ABR[parseInt(m,10)-1]+'/'+y;
+    }
+    return state.periods.length+' meses';
+  }
   if(state.preset==='all') return 'Tudo';
   if(state.preset==='ytd') return 'Ano até hoje';
   if(state.preset==='last3') return 'Últimos 3 m';
@@ -1555,6 +1581,12 @@ function periodLabel(){
   return yl;
 }
 function periodLabelLong(){
+  if(state.periods && state.periods.length){
+    const sorted = state.periods.slice().sort();
+    const fmt = ym => { const [y,m] = ym.split('-'); return MONTHS_ABR[parseInt(m,10)-1]+'/'+y; };
+    if(sorted.length<=3) return sorted.map(fmt).join(' · ');
+    return sorted.length+' meses ('+fmt(sorted[0])+' – '+fmt(sorted[sorted.length-1])+')';
+  }
   if(state.preset==='all') return 'Todo o histórico';
   if(state.preset==='ytd') return 'Ano até hoje';
   if(state.preset==='last3') return 'Últimos 3 meses';
@@ -1568,6 +1600,7 @@ function periodLabelLong(){
   return 'Anos '+yl;
 }
 function previousPeriodLabel(){
+  if(state.periods && state.periods.length) return 'período anterior';
   if(state.preset==='all') return '';
   if(state.preset==='ytd'){
     const idx = years.indexOf(years[years.length-1]);
@@ -1588,14 +1621,34 @@ sheetBg.addEventListener('click', e => { if(e.target===sheetBg){ sheetBg.classLi
 function renderSheet(){
   const ySel = new Set(state.years);
   const mSel = new Set(state.months);
+  const pSel = new Set(state.periods||[]);
+  const periodsActive = pSel.size>0;
   document.getElementById('sheetYears').innerHTML = years.map(y =>
-    `<button class="p-chip ${(!state.preset && ySel.has(y))?'active':''}" data-y="${y}">${y}</button>`
+    `<button class="p-chip ${(!periodsActive && !state.preset && ySel.has(y))?'active':''}" data-y="${y}">${y}</button>`
   ).join('');
   document.getElementById('sheetMonths').innerHTML =
-    `<button class="p-chip ${(state.months.length===0 && !state.preset)?'active':''}" data-m="all">Todos</button>` +
-    MONTHS_ABR.map((m,i) => `<button class="p-chip ${(mSel.has(i) && !state.preset)?'active':''}" data-m="${i}">${m}</button>`).join('');
+    `<button class="p-chip ${(!periodsActive && state.months.length===0 && !state.preset)?'active':''}" data-m="all">Todos</button>` +
+    MONTHS_ABR.map((m,i) => `<button class="p-chip ${(!periodsActive && mSel.has(i) && !state.preset)?'active':''}" data-m="${i}">${m}</button>`).join('');
+  const allPeriods = [...new Set(LANCAMENTOS.map(r => (r.data||'').slice(0,7)).filter(Boolean))].sort();
+  const sp = document.getElementById('sheetPeriods');
+  if(sp){
+    sp.innerHTML = allPeriods.map(ym => {
+      const [y,m] = ym.split('-');
+      const lbl = MONTHS_ABR[parseInt(m,10)-1]+'/'+y;
+      return `<button class="p-chip ${pSel.has(ym)?'active':''}" data-p="${ym}">${lbl}</button>`;
+    }).join('');
+    sp.querySelectorAll('.p-chip').forEach(b => b.addEventListener('click', () => {
+      const ym = b.dataset.p;
+      state.preset = null;
+      const cur = new Set(state.periods||[]);
+      if(cur.has(ym)) cur.delete(ym); else cur.add(ym);
+      state.periods = [...cur].sort();
+      renderSheet(); refreshAll();
+    }));
+  }
   document.querySelectorAll('#sheetYears .p-chip').forEach(b => b.addEventListener('click', () => {
     const y = b.dataset.y;
+    state.periods = [];
     if(state.preset){ state.preset=null; state.years=[y]; state.months=[]; }
     else if(ySel.has(y)){
       if(state.years.length===1){ toast('Pelo menos 1 ano precisa ficar selecionado'); return; }
@@ -1605,6 +1658,7 @@ function renderSheet(){
   }));
   document.querySelectorAll('#sheetMonths .p-chip').forEach(b => b.addEventListener('click', () => {
     const v = b.dataset.m;
+    state.periods = [];
     if(state.preset){ state.preset=null; state.years = state.years.length?state.years:[years[years.length-1]]; state.months=[]; }
     if(v==='all'){ state.months = []; }
     else {
@@ -1615,11 +1669,11 @@ function renderSheet(){
     renderSheet(); refreshAll();
   }));
   document.querySelectorAll('.preset-grid .p-chip').forEach(b => {
-    b.classList.toggle('active', state.preset===b.dataset.preset);
+    b.classList.toggle('active', !periodsActive && state.preset===b.dataset.preset);
   });
 }
 document.querySelectorAll('.preset-grid .p-chip').forEach(b => b.addEventListener('click', () => {
-  state.preset = b.dataset.preset; state.months=[]; renderSheet(); refreshAll(); setTimeout(()=>{sheetBg.classList.remove('open');document.body.classList.remove('sheet-open');},120);
+  state.periods = []; state.preset = b.dataset.preset; state.months=[]; renderSheet(); refreshAll(); setTimeout(()=>{sheetBg.classList.remove('open');document.body.classList.remove('sheet-open');},120);
 }));
 
 /* ===================== TABS ===================== */
