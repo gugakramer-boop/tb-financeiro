@@ -682,11 +682,12 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 .ms-btn{width:100%;padding:9px 30px 9px 12px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:9px;font-size:13px;color:var(--cp-text);text-align:left;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
 .ms-btn::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--cp-text-soft);pointer-events:none}
 .ms-btn.has-sel{border-color:var(--cp-accent);color:var(--cp-accent);font-weight:600}
-.ms-pop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:10px;box-shadow:var(--cp-shadow-strong);z-index:50;max-height:260px;overflow-y:auto;display:none;padding:4px}
+.ms-pop{position:absolute;top:calc(100% + 4px);left:0;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:10px;box-shadow:var(--cp-shadow-strong);z-index:50;max-height:60vh;overflow-y:auto;display:none;padding:4px;min-width:max(100%,240px);max-width:min(360px,calc(100vw - 32px))}
+.ms-pop.right{left:auto;right:0}
 .ms-pop.open{display:block}
-.ms-pop label{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--cp-text)}
+.ms-pop label{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--cp-text);line-height:1.35;word-break:break-word}
 .ms-pop label:hover{background:var(--cp-surface-soft)}
-.ms-pop input[type=checkbox]{width:auto;margin:0;accent-color:var(--cp-accent)}
+.ms-pop input[type=checkbox]{width:auto;margin:2px 0 0;accent-color:var(--cp-accent);flex:0 0 auto}
 .ms-pop .ms-head{display:flex;justify-content:space-between;padding:6px 10px 4px;border-bottom:1px solid var(--cp-border);margin-bottom:4px}
 .ms-pop .ms-head button{background:none;border:none;color:var(--cp-accent);font-size:11.5px;cursor:pointer;padding:2px 4px;font-weight:600}
 </style>
@@ -1087,7 +1088,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:28</span> · <span id="recCount"></span> lançamentos · v4.7 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:32</span> · <span id="recCount"></span> lançamentos · v4.7.1 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -2346,7 +2347,12 @@ function buildMultiSelect(btnId, popId, options, labelAll, state){
   btn.onclick = e => {
     e.stopPropagation();
     document.querySelectorAll('.ms-pop.open').forEach(p=>{ if(p!==pop) p.classList.remove('open'); });
+    pop.classList.remove('right');
     pop.classList.toggle('open');
+    if(pop.classList.contains('open')){
+      const r = pop.getBoundingClientRect();
+      if(r.right > window.innerWidth - 8) pop.classList.add('right');
+    }
   };
   pop.onclick = e => e.stopPropagation();
   pop.querySelectorAll('input[type=checkbox]').forEach(cb => cb.onchange = () => {
