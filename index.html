@@ -1069,8 +1069,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <summary>Clique aqui para visualizar os filtros <span class="filter-count" id="filterCount"></span></summary>
       <div class="filters">
         <input id="fSearch" placeholder="🔍 Buscar descrição, área, categoria, bucket...">
-        <div class="ms-wrap"><button type="button" class="ms-btn" id="fAnoBtn" data-default="Todos os anos">Todos os anos</button><div class="ms-pop" id="fAnoPop"></div></div>
-        <div class="ms-wrap"><button type="button" class="ms-btn" id="fMesBtn" data-default="Todos os meses">Todos os meses</button><div class="ms-pop" id="fMesPop"></div></div>
+        <div class="ms-wrap"><button type="button" class="ms-btn" id="fPeriodoBtn" data-default="Todos os períodos">Todos os períodos</button><div class="ms-pop" id="fPeriodoPop"></div></div>
         <div class="ms-wrap"><button type="button" class="ms-btn" id="fTipoBtn" data-default="Todos os tipos">Todos os tipos</button><div class="ms-pop" id="fTipoPop"></div></div>
         <div class="ms-wrap"><button type="button" class="ms-btn" id="fBucketBtn" data-default="Todos os buckets">Todos os buckets</button><div class="ms-pop" id="fBucketPop"></div></div>
         <div class="ms-wrap"><button type="button" class="ms-btn" id="fSubBtn" data-default="Todas as sub-categorias">Todas as sub-categorias</button><div class="ms-pop" id="fSubPop"></div></div>
@@ -1191,7 +1190,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 12:25</span> · <span id="recCount"></span> lançamentos · v4.9.2 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 13:00</span> · <span id="recCount"></span> lançamentos · v4.9.3 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -2625,11 +2624,12 @@ const lancFilter = {
   contas: new Set(),
   anos: new Set(),
   meses: new Set(),
+  periodos: new Set(),
 };
 function activeFilterCount(){
   const f = lancFilter;
   let n = 0;
-  ['tipos','areas','buckets','subs','cats','resps','contas','anos','meses'].forEach(k => { if(f[k].size) n++; });
+  ['tipos','areas','buckets','subs','cats','resps','contas','periodos'].forEach(k => { if(f[k].size) n++; });
   const q = (document.getElementById('fSearch')||{}).value || '';
   if(q.trim()) n++;
   return n;
@@ -2683,10 +2683,11 @@ function renderLanc(){
   const recs = recordsInPeriod();
   const uniq = (k) => [...new Set(LANCAMENTOS.map(r=>r[k]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   buildMultiSelect('fTipoBtn','fTipoPop', ['Receita','Despesa'], 'Todos os tipos', lancFilter.tipos);
-  const yearOpts  = [...new Set(LANCAMENTOS.map(r => (r.data||'').slice(0,4)).filter(Boolean))].sort().reverse();
-  const monthOpts = ['01 · Janeiro','02 · Fevereiro','03 · Março','04 · Abril','05 · Maio','06 · Junho','07 · Julho','08 · Agosto','09 · Setembro','10 · Outubro','11 · Novembro','12 · Dezembro'];
-  buildMultiSelect('fAnoBtn','fAnoPop', yearOpts, 'Todos os anos', lancFilter.anos);
-  buildMultiSelect('fMesBtn','fMesPop', monthOpts, 'Todos os meses', lancFilter.meses);
+  const MESES_ABR = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const periodOpts = [...new Set(LANCAMENTOS.map(r => (r.data||'').slice(0,7)).filter(Boolean))]
+    .sort().reverse()
+    .map(ym => `${MESES_ABR[parseInt(ym.slice(5,7),10)-1]}/${ym.slice(0,4)}`);
+  buildMultiSelect('fPeriodoBtn','fPeriodoPop', periodOpts, 'Todos os períodos', lancFilter.periodos);
   buildMultiSelect('fBucketBtn','fBucketPop', uniq('bucket'), 'Todos os buckets', lancFilter.buckets);
   buildMultiSelect('fSubBtn','fSubPop', uniq('sub'), 'Todas as sub-categorias', lancFilter.subs);
   buildMultiSelect('fAreaBtn','fAreaPop', uniq('area'), 'Todas as áreas', lancFilter.areas);
@@ -2708,8 +2709,13 @@ function getFilteredLanc(baseRecs){
   else cmp = (x,y)=>strCmp(x[k], y[k]);
   const f = lancFilter;
   return baseRecs
-    .filter(r => f.anos.size===0    || f.anos.has((r.data||'').slice(0,4)))
-    .filter(r => f.meses.size===0   || f.meses.has(((r.data||'').slice(5,7) ? (r.data||'').slice(5,7) + ' · ' + ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][parseInt((r.data||'').slice(5,7),10)-1] : '')))
+    .filter(r => {
+      if(f.periodos.size===0) return true;
+      const ym = (r.data||'').slice(0,7);
+      if(!ym) return false;
+      const lbl = `${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(ym.slice(5,7),10)-1]}/${ym.slice(0,4)}`;
+      return f.periodos.has(lbl);
+    })
     .filter(r => f.tipos.size===0   || f.tipos.has(r.tipo))
     .filter(r => f.buckets.size===0 || f.buckets.has(r.bucket))
     .filter(r => f.subs.size===0    || f.subs.has(r.sub))
@@ -2869,7 +2875,7 @@ document.querySelectorAll('.lv-btn[data-view]').forEach(b => {
 document.addEventListener('click', () => document.querySelectorAll('.ms-pop.open').forEach(p=>p.classList.remove('open')));
 document.getElementById('lancMore').addEventListener('click', ()=>{lancShown+=120;applyLancFilter();});
 document.getElementById('fClear').addEventListener('click', () => {
-  ['tipos','areas','buckets','subs','cats','resps','contas','anos','meses'].forEach(k => lancFilter[k].clear());
+  ['tipos','areas','buckets','subs','cats','resps','contas','periodos'].forEach(k => lancFilter[k].clear());
   document.getElementById('fSearch').value = '';
   lancShown = 60;
   renderLanc();
