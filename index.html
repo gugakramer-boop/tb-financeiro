@@ -282,11 +282,14 @@ html[data-theme="dark"] .delta.neg{background:rgba(248,113,113,0.14)}
 
 /* ============ FILTERS ============ */
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.filters input,.filters select{
+.filters input,.filters select,.filters .ms-wrap{
   font-family:inherit; font-size:13px;
+  flex:1; min-width:140px;
+}
+.filters input,.filters select{
   background:var(--cp-surface); color:var(--cp-text);
   border:1px solid var(--cp-border); border-radius:12px; padding:9px 12px;
-  flex:1; min-width:130px; transition:border-color .15s;
+  transition:border-color .15s;
 }
 .filters input:focus,.filters select:focus{outline:none;border-color:var(--cp-accent)}
 
@@ -678,8 +681,8 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 .filters select.sort{flex:0 0 auto}
 
 /* ============ MULTI-SELECT ============ */
-.ms-wrap{position:relative;flex:1;min-width:140px}
-.ms-btn{width:100%;padding:9px 30px 9px 12px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:9px;font-size:13px;color:var(--cp-text);text-align:left;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
+.ms-wrap{position:relative}
+.ms-btn{width:100%;padding:9px 30px 9px 12px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:12px;font-size:13px;color:var(--cp-text);text-align:left;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
 .ms-btn::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--cp-text-soft);pointer-events:none}
 .ms-btn.has-sel{border-color:var(--cp-accent);color:var(--cp-accent);font-weight:600}
 .ms-pop{position:absolute;top:calc(100% + 4px);left:0;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:10px;box-shadow:var(--cp-shadow-strong);z-index:50;max-height:60vh;overflow-y:auto;display:none;padding:4px;min-width:max(100%,240px);max-width:min(360px,calc(100vw - 32px))}
@@ -742,7 +745,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   <button class="tab-top" data-tab="noivas">Noivas</button>
   <button class="tab-top" data-tab="cursos">Cursos</button>
   <button class="tab-top" data-tab="areas">Áreas</button>
-  <button class="tab-top" data-tab="lancamentos">Lançamentos</button>
+  <button class="tab-top" data-tab="lancamentos">Itens</button>
 </nav>
 
 <main>
@@ -989,7 +992,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   <!-- LANCAMENTOS -->
   <section class="panel" id="panel-lancamentos">
     <div class="toolbar-row">
-      <div class="subhead" style="margin:0">Lançamentos <span class="info" id="lancCount"></span></div>
+      <div class="subhead" style="margin:0">Itens <span class="info" id="lancCount"></span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-secondary" id="reconcileBtn">🔍 Reconciliar</button>
         <button class="btn-secondary" id="exportXlsx">📊 Excel</button>
@@ -1088,7 +1091,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:32</span> · <span id="recCount"></span> lançamentos · v4.7.1 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 07:42</span> · <span id="recCount"></span> lançamentos · v4.7.2 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
