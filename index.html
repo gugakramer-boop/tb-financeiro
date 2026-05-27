@@ -755,7 +755,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   <button class="tab-top" data-tab="dre">DRE</button>
   <button class="tab-top" data-tab="noivas">Noivas</button>
   <button class="tab-top" data-tab="cursos">Cursos</button>
-  <button class="tab-top" data-tab="areas">Áreas</button>
+  <button class="tab-top" data-tab="areas">Categorias</button>
   <button class="tab-top" data-tab="lancamentos">Itens</button>
 </nav>
 
@@ -970,7 +970,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <button data-tab="noivas">💍 Noivas</button>
       <button data-tab="cursos">🎓 Cursos</button>
     </div>
-    <div class="subhead">Top despesas com tendência <span class="info">últimos 6 meses</span></div>
+    <div class="subhead">Top despesas por <b>Bucket</b> com tendência <span class="info">últimos 6 meses</span></div>
     <div class="card" style="padding:6px 16px">
       <div class="spark-list" id="topDespesasSparks"></div>
     </div>
@@ -990,16 +990,21 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
       <div id="listAllSubsD" style="margin-top:4px"></div>
     </div>
 
-    <div class="subhead" style="margin-top:18px">Receita por área <span class="info">visão antiga</span></div>
-    <div class="card">
-      <div class="chart-wrap short"><canvas id="chartAllAreasR"></canvas></div>
-      <div id="listAllAreasR" style="margin-top:8px"></div>
-    </div>
-    <div class="subhead">Despesa por área <span class="info">visão antiga</span></div>
-    <div class="card">
-      <div class="chart-wrap short"><canvas id="chartAllAreasD"></canvas></div>
-      <div id="listAllAreasD" style="margin-top:8px"></div>
-    </div>
+    <details class="filters-collapse" style="margin-top:18px">
+      <summary>Visão legada por Área <span class="filter-count">(referência histórica)</span></summary>
+      <div style="padding:0 14px 12px">
+        <div class="subhead" style="margin-top:8px">Receita por área</div>
+        <div class="card">
+          <div class="chart-wrap short"><canvas id="chartAllAreasR"></canvas></div>
+          <div id="listAllAreasR" style="margin-top:8px"></div>
+        </div>
+        <div class="subhead">Despesa por área</div>
+        <div class="card">
+          <div class="chart-wrap short"><canvas id="chartAllAreasD"></canvas></div>
+          <div id="listAllAreasD" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </details>
   </section>
 
   <!-- LANCAMENTOS -->
@@ -1046,7 +1051,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
 <nav class="bnav">
   <button class="active" data-tab="resumo"><span class="ic">📊</span>Resumo</button>
   <button data-tab="dre"><span class="ic">📅</span>DRE</button>
-  <button data-tab="areas" data-tab-group="areas-hub"><span class="ic">📂</span>Áreas</button>
+  <button data-tab="areas" data-tab-group="areas-hub"><span class="ic">📂</span>Categorias</button>
   <button data-tab="lancamentos"><span class="ic">📋</span>Itens</button>
 </nav>
 
@@ -1114,7 +1119,7 @@ body.accountant-mode .acc-badge{display:inline-flex !important}
   </div>
 </div>
 
-<div class="footer">Atualizado em <span id="genAt">27/05/2026 09:45</span> · <span id="recCount"></span> lançamentos · v4.7.8 <span class="acc-badge">modo contador</span></div>
+<div class="footer">Atualizado em <span id="genAt">27/05/2026 09:48</span> · <span id="recCount"></span> lançamentos · v4.7.9 <span class="acc-badge">modo contador</span></div>
 
 <div class="toast" id="toast"></div>
 
@@ -2696,10 +2701,10 @@ function sparklineSvg(values, color){
 }
 function renderTopDespesasSparks(){
   const recs = recordsInPeriod();
-  const ad = sumByArea(recs, 'Despesa').slice(0,10);
+  const bd = sumByBucket(recs, 'Despesa').slice(0,10);
   const target = document.getElementById('topDespesasSparks');
-  if(!ad.length){ target.innerHTML = '<div class="empty">Sem despesas no período.</div>'; return; }
-  // Build last-6-month series per area from full data, ending at latest date present
+  if(!bd.length){ target.innerHTML = '<div class="empty">Sem despesas no período.</div>'; return; }
+  // Build last-6-month series per bucket from full data, ending at latest date present
   const dates = LANCAMENTOS.map(r=>r.data).sort();
   const latest = new Date(dates[dates.length-1]+'T12:00:00');
   const monthKeys = [];
@@ -2708,13 +2713,13 @@ function renderTopDespesasSparks(){
     monthKeys.push(d.toISOString().slice(0,7));
   }
   const prev = previousPeriodRecords();
-  target.innerHTML = ad.map(([area, total])=>{
-    const c = hashColor(area);
+  target.innerHTML = bd.map(([bucket, total])=>{
+    const c = hashColor(bucket);
     const m = new Map(monthKeys.map(k=>[k,0]));
-    LANCAMENTOS.filter(r => r.tipo==='Despesa' && (r.area||'(sem área)')===area && m.has(ymKey(r)))
+    LANCAMENTOS.filter(r => r.tipo==='Despesa' && (r.bucket||'(sem bucket)')===bucket && m.has(ymKey(r)))
       .forEach(r => m.set(ymKey(r), m.get(ymKey(r)) + r.valor));
     const vals = monthKeys.map(k => m.get(k));
-    const prevTotal = prev.filter(r => r.tipo==='Despesa' && (r.area||'(sem área)')===area).reduce((a,r)=>a+r.valor,0);
+    const prevTotal = prev.filter(r => r.tipo==='Despesa' && (r.bucket||'(sem bucket)')===bucket).reduce((a,r)=>a+r.valor,0);
     let trendHtml = '<span class="trend">—</span>';
     if(prevTotal>0){
       const p = (total-prevTotal)/prevTotal*100;
@@ -2724,15 +2729,15 @@ function renderTopDespesasSparks(){
     } else if(total>0){
       trendHtml = '<span class="trend up">novo</span>';
     }
-    return `<div class="spark-row" data-area="${escapeHtml(area)}">
+    return `<div class="spark-row" data-bucket="${escapeHtml(bucket)}">
       <span class="sw" style="background:${c}"></span>
-      <div class="nm">${escapeHtml(area)}<span class="m">Últimos 6 meses</span></div>
+      <div class="nm">${escapeHtml(bucket)}<span class="m">Últimos 6 meses</span></div>
       <div class="sk">${sparklineSvg(vals, c)}</div>
       <div><div class="am neg">${fmtCompact(total)}</div>${trendHtml}</div>
     </div>`;
   }).join('');
   document.querySelectorAll('#topDespesasSparks .spark-row').forEach(el =>
-    el.addEventListener('click', () => { const a=el.dataset.area; openDrill(a+' · '+periodLabel(), recs.filter(r=>(r.area||'(sem área)')===a && r.tipo==='Despesa')); }));
+    el.addEventListener('click', () => { const b=el.dataset.bucket; openDrill(b+' · '+periodLabel(), recs.filter(r=>(r.bucket||'(sem bucket)')===b && r.tipo==='Despesa')); }));
 }
 
 /* ===================== AI INSIGHTS (rule-based) ===================== */
